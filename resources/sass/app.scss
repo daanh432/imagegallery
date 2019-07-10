@@ -1,6 +1,30 @@
-// Fonts
-@import url('https://fonts.googleapis.com/css?family=Nunito');
-// Variables
-@import 'variables';
-// Bootstrap
-@import '~bootstrap/scss/bootstrap';
+body,html {
+    margin: 0;
+    padding: 0;
+}
+// 1. Your custom variables and variable overwrites.
+$global-link-color: #DA7D02;
+$base-heading-color: #50B287;
+//$nav-header-text-transform: none;
+$navbar-nav-item-text-transform: none;
+$global-primary-background: #FFFFFF;
+$border-rounded-border-radius: 10px;
+$form-focus-background: #f8f8f8;
+$form-focus-border: #a9a9a9;
+$navbar-background: #707070;
+
+// 2. Import default variables and available mixins.
+@import "~uikit/src/scss/variables-theme.scss";
+@import "~uikit/src/scss/mixins-theme.scss";
+
+// 4. Import UIkit.
+@import "~uikit/src/scss/uikit-theme.scss";
+
+body,html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+.router-link-exact-active {
+    font-weight: bold;
+}

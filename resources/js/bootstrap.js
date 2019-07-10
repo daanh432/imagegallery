@@ -1,3 +1,5 @@
+import Icons from 'uikit/dist/js/uikit-icons';
+
 window._ = require('lodash');
 
 /**
@@ -7,10 +9,17 @@ window._ = require('lodash');
  */
 
 try {
-    window.Popper = require('popper.js').default;
+    // window.Popper = require('popper.js').default;
     window.$ = window.jQuery = require('jquery');
 
-    require('bootstrap');
+    window.UIkit = require('uikit');
+
+    // loads the Icon plugin
+    UIkit.use(Icons);
+
+    // components can be called from the imported UIkit reference
+    // UIkit.notification('Hello world.');
+
 } catch (e) {
 }
 
