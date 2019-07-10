@@ -38,13 +38,13 @@
             </div>
         </nav>
         <div uk-height-viewport="offset-top: true" data-src="/assets/img/background.jpg" uk-img class="uk-background-cover">
-<!--            <div v-if="$auth.ready()">-->
-<!--                <router-view></router-view>-->
-<!--            </div>-->
-<!--            <div class="uk-position-center" v-else>-->
-<!--                <h1>Please wait whilst the site is loading.</h1>-->
-<!--            </div>-->
-            <router-view></router-view>
+            <div v-if="$auth.ready()">
+                <router-view></router-view>
+            </div>
+            <div class="uk-position-center" v-else>
+                <h1>Please wait whilst the site is loading.</h1>
+            </div>
+            <!--            <router-view></router-view>-->
         </div>
     </div>
 </template>

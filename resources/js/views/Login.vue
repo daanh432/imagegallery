@@ -15,7 +15,7 @@
                     <div class="uk-form-controls">
                         <input class="uk-input uk-border-rounded" id="password" name="password" type="password" placeholder="Password" v-model="password" v-validate="'required'">
                         <span>{{ errors.first('password') }}</span>
-<!--                        <a class="uk-link-muted" href="/reset">Reset Password</a>-->
+                        <!--                        <a class="uk-link-muted" href="/reset">Reset Password</a>-->
                     </div>
                 </div>
                 <button type="submit" class="uk-button uk-button-default uk-align-center uk-margin-remove-bottom uk-margin-top">Login</button>
@@ -34,6 +34,15 @@
         },
         methods: {
             login() {
+                this.$validator.validateAll().then();
+                if (this.errors.any()) {
+                    return window.UIkit.notification({
+                        message: 'Please resolve validation errors before submitting.',
+                        status: 'warning',
+                        pos: 'bottom-center',
+                        timeout: 2500
+                    });
+                }
                 // get the redirect object
                 let redirect = this.$auth.redirect();
                 let app = this;

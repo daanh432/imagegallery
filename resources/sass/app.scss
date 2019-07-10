@@ -1,17 +1,22 @@
-body,html {
-    margin: 0;
-    padding: 0;
-}
-// 1. Your custom variables and variable overwrites.
+// Color variables
+$primary-green: #50B287;
+
+// 1. UIKit overrides
+// 1.1 Default link and heading colours
 $global-link-color: #DA7D02;
-$base-heading-color: #50B287;
-//$nav-header-text-transform: none;
-$navbar-nav-item-text-transform: none;
-$global-primary-background: #FFFFFF;
-$border-rounded-border-radius: 10px;
-$form-focus-background: #f8f8f8;
-$form-focus-border: #a9a9a9;
+$base-heading-color: $primary-green;
+
+// 1.2 Navbar styling
+$navbar-nav-item-text-transform: none; // Disable all capital letters on navbar items
 $navbar-background: #707070;
+
+// 1.3 Button styling
+$button-default-background: $primary-green;
+$button-default-color: #FFFFFF;
+$button-text-transform: none;
+
+$background-primary-background: #FFFFFF;
+$border-rounded-border-radius: 10px;
 
 // 2. Import default variables and available mixins.
 @import "~uikit/src/scss/variables-theme.scss";
@@ -20,6 +25,7 @@ $navbar-background: #707070;
 // 4. Import UIkit.
 @import "~uikit/src/scss/uikit-theme.scss";
 
+// 5. Custom css.
 body,html {
     margin: 0;
     padding: 0;

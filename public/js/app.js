@@ -266,7 +266,7 @@ module.exports = {
 
 var __utils  = __webpack_require__(/*! ./lib/utils.js */ "./node_modules/@websanova/vue-auth/src/lib/utils.js"),
     __token  = __webpack_require__(/*! ./lib/token.js */ "./node_modules/@websanova/vue-auth/src/lib/token.js"),
-    __cookie = __webpack_require__(/*! ./lib/cookie.js */ "./node_modules/@websanova/vue-auth/src/lib/cookie.js")
+    __cookie = __webpack_require__(/*! ./lib/cookie.js */ "./node_modules/@websanova/vue-auth/src/lib/cookie.js");
 
 module.exports = function () {
 
@@ -449,7 +449,7 @@ module.exports = function () {
     }
 
     function _getUrl () {
-        var port = window.location.port
+        var port = window.location.port;
 
         return window.location.protocol + '//' + window.location.hostname + (port ? ':' + port : '')
     }
@@ -956,7 +956,7 @@ module.exports = function () {
 
     Auth.prototype.oauth2 = function (data) {
         return __bindContext.call(this, 'oauth2', data);
-    }
+    };
 
     Auth.prototype.enableImpersonate = function () {
         if (this.impersonating()) {
@@ -3114,14 +3114,58 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
       fullName: '',
       emailAddress: '',
-      message: ''
+        message: '',
+        success: false
     };
-  }
+  },
+            methods: {
+                sendMessage: function sendMessage() {
+                    this.$validator.validateAll().then();
+
+                    if (this.errors.any()) {
+                        return window.UIkit.notification({
+                            message: 'Please resolve validation errors before submitting.',
+                            status: 'warning',
+                            pos: 'bottom-center',
+                            timeout: 2500
+                        });
+                    }
+
+                    var app = this;
+                    axios.post('contact', {
+                        name: this.fullName,
+                        email: this.emailAddress,
+                        message: this.message
+                    }).then(function (data) {
+                        window.UIkit.notification({
+                            message: 'Message has been delivered.',
+                            status: 'success',
+                            pos: 'bottom-center',
+                            timeout: 10000
+                        });
+                        app.success = true;
+                    })["catch"](function (data) {
+                        window.UIkit.notification({
+                            message: 'Something went wrong trying to send your message. Please try again later.',
+                            status: 'danger',
+                            pos: 'bottom-center',
+                            timeout: 5000
+                        });
+                    });
+                }
+            }
 });
 
 /***/ }),
@@ -3186,7 +3230,18 @@ __webpack_require__.r(__webpack_exports__);
   },
   methods: {
     login: function login() {
-      // get the redirect object
+        this.$validator.validateAll().then();
+
+        if (this.errors.any()) {
+            return window.UIkit.notification({
+                message: 'Please resolve validation errors before submitting.',
+                status: 'warning',
+                pos: 'bottom-center',
+                timeout: 2500
+            });
+        } // get the redirect object
+
+
       var redirect = this.$auth.redirect();
       var app = this;
       this.$auth.login({
@@ -7380,8 +7435,9 @@ function nodeName( elem, name ) {
 
   return elem.nodeName && elem.nodeName.toLowerCase() === name.toLowerCase();
 
-};
-var rsingleTag = ( /^<([a-z][^\/\0>:\x20\t\r\n\f]*)[\x20\t\r\n\f]*\/?>(?:<\/\1>|)$/i );
+}
+
+    var rsingleTag = (/^<([a-z][^\/\0>:\x20\t\r\n\f]*)[\x20\t\r\n\f]*\/?>(?:<\/\1>|)$/i);
 
 
 
@@ -15161,17 +15217,11 @@ return jQuery;
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(global, module) {var __WEBPACK_AMD_DEFINE_RESULT__;/**
- * @license
- * Lodash <https://lodash.com/>
- * Copyright JS Foundation and other contributors <https://js.foundation/>
- * Released under MIT license <https://lodash.com/license>
- * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
- * Copyright Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
- */
-;(function() {
-
-  /** Used as a safe reference for `undefined` in pre-ES5 environments. */
+        /* WEBPACK VAR INJECTION */
+        (function (global, module) {
+            var __WEBPACK_AMD_DEFINE_RESULT__;
+            (function () {
+                /** Used as a safe reference for `undefined` in pre-ES5 environments. */
   var undefined;
 
   /** Used as the semantic version number. */
@@ -32308,7 +32358,7 @@ function defaultClearTimeout () {
     } catch (e) {
         cachedClearTimeout = defaultClearTimeout;
     }
-} ())
+}());
 function runTimeout(fun) {
     if (cachedSetTimeout === setTimeout) {
         //normal enviroments in sane situations
@@ -32445,7 +32495,9 @@ process.emit = noop;
 process.prependListener = noop;
 process.prependOnceListener = noop;
 
-process.listeners = function (name) { return [] }
+        process.listeners = function (name) {
+            return []
+        };
 
 process.binding = function (name) {
     throw new Error('process.binding is not supported');
@@ -50291,9 +50343,9 @@ function ordinalNumber (dirtyNumber, dirtyOptions) {
   if (rem100 > 20 || rem100 < 10) {
     switch (rem100 % 10) {
       case 1:
-        return number + 'st'
+          return number + 'st';
       case 2:
-        return number + 'nd'
+          return number + 'nd';
       case 3:
         return number + 'rd'
     }
@@ -50819,10 +50871,10 @@ var formatters = {
       case 'G':
       case 'GG':
       case 'GGG':
-        return localize.era(era, {width: 'abbreviated'})
+          return localize.era(era, {width: 'abbreviated'});
       // A, B
       case 'GGGGG':
-        return localize.era(era, {width: 'narrow'})
+          return localize.era(era, {width: 'narrow'});
       // Anno Domini, Before Christ
       case 'GGGG':
       default:
@@ -50909,19 +50961,19 @@ var formatters = {
     switch (token) {
       // 1, 2, 3, 4
       case 'Q':
-        return String(quarter)
+          return String(quarter);
       // 01, 02, 03, 04
       case 'QQ':
-        return addLeadingZeros(quarter, 2)
+          return addLeadingZeros(quarter, 2);
       // 1st, 2nd, 3rd, 4th
       case 'Qo':
-        return localize.ordinalNumber(quarter, {unit: 'quarter'})
+          return localize.ordinalNumber(quarter, {unit: 'quarter'});
       // Q1, Q2, Q3, Q4
       case 'QQQ':
-        return localize.quarter(quarter, {width: 'abbreviated', context: 'formatting'})
+          return localize.quarter(quarter, {width: 'abbreviated', context: 'formatting'});
       // 1, 2, 3, 4 (narrow quarter; could be not numerical)
       case 'QQQQQ':
-        return localize.quarter(quarter, {width: 'narrow', context: 'formatting'})
+          return localize.quarter(quarter, {width: 'narrow', context: 'formatting'});
       // 1st quarter, 2nd quarter, ...
       case 'QQQQ':
       default:
@@ -50935,19 +50987,19 @@ var formatters = {
     switch (token) {
       // 1, 2, 3, 4
       case 'q':
-        return String(quarter)
+          return String(quarter);
       // 01, 02, 03, 04
       case 'qq':
-        return addLeadingZeros(quarter, 2)
+          return addLeadingZeros(quarter, 2);
       // 1st, 2nd, 3rd, 4th
       case 'qo':
-        return localize.ordinalNumber(quarter, {unit: 'quarter'})
+          return localize.ordinalNumber(quarter, {unit: 'quarter'});
       // Q1, Q2, Q3, Q4
       case 'qqq':
-        return localize.quarter(quarter, {width: 'abbreviated', context: 'standalone'})
+          return localize.quarter(quarter, {width: 'abbreviated', context: 'standalone'});
       // 1, 2, 3, 4 (narrow quarter; could be not numerical)
       case 'qqqqq':
-        return localize.quarter(quarter, {width: 'narrow', context: 'standalone'})
+          return localize.quarter(quarter, {width: 'narrow', context: 'standalone'});
       // 1st quarter, 2nd quarter, ...
       case 'qqqq':
       default:
@@ -50961,19 +51013,19 @@ var formatters = {
     switch (token) {
       // 1, 2, ..., 12
       case 'M':
-        return String(month + 1)
+          return String(month + 1);
       // 01, 02, ..., 12
       case 'MM':
-        return addLeadingZeros(month + 1, 2)
+          return addLeadingZeros(month + 1, 2);
       // 1st, 2nd, ..., 12th
       case 'Mo':
-        return localize.ordinalNumber(month + 1, {unit: 'month'})
+          return localize.ordinalNumber(month + 1, {unit: 'month'});
       // Jan, Feb, ..., Dec
       case 'MMM':
-        return localize.month(month, {width: 'abbreviated', context: 'formatting'})
+          return localize.month(month, {width: 'abbreviated', context: 'formatting'});
       // J, F, ..., D
       case 'MMMMM':
-        return localize.month(month, {width: 'narrow', context: 'formatting'})
+          return localize.month(month, {width: 'narrow', context: 'formatting'});
       // January, February, ..., December
       case 'MMMM':
       default:
@@ -50987,19 +51039,19 @@ var formatters = {
     switch (token) {
       // 1, 2, ..., 12
       case 'L':
-        return String(month + 1)
+          return String(month + 1);
       // 01, 02, ..., 12
       case 'LL':
-        return addLeadingZeros(month + 1, 2)
+          return addLeadingZeros(month + 1, 2);
       // 1st, 2nd, ..., 12th
       case 'Lo':
-        return localize.ordinalNumber(month + 1, {unit: 'month'})
+          return localize.ordinalNumber(month + 1, {unit: 'month'});
       // Jan, Feb, ..., Dec
       case 'LLL':
-        return localize.month(month, {width: 'abbreviated', context: 'standalone'})
+          return localize.month(month, {width: 'abbreviated', context: 'standalone'});
       // J, F, ..., D
       case 'LLLLL':
-        return localize.month(month, {width: 'narrow', context: 'standalone'})
+          return localize.month(month, {width: 'narrow', context: 'standalone'});
       // January, February, ..., December
       case 'LLLL':
       default:
@@ -51059,13 +51111,13 @@ var formatters = {
       case 'E':
       case 'EE':
       case 'EEE':
-        return localize.day(dayOfWeek, {width: 'abbreviated', context: 'formatting'})
+          return localize.day(dayOfWeek, {width: 'abbreviated', context: 'formatting'});
       // T
       case 'EEEEE':
-        return localize.day(dayOfWeek, {width: 'narrow', context: 'formatting'})
+          return localize.day(dayOfWeek, {width: 'narrow', context: 'formatting'});
       // Tu
       case 'EEEEEE':
-        return localize.day(dayOfWeek, {width: 'short', context: 'formatting'})
+          return localize.day(dayOfWeek, {width: 'short', context: 'formatting'});
       // Tuesday
       case 'EEEE':
       default:
@@ -51080,21 +51132,21 @@ var formatters = {
     switch (token) {
       // Numerical value (Nth day of week with current locale or weekStartsOn)
       case 'e':
-        return String(localDayOfWeek)
+          return String(localDayOfWeek);
       // Padded numerical value
       case 'ee':
-        return addLeadingZeros(localDayOfWeek, 2)
+          return addLeadingZeros(localDayOfWeek, 2);
       // 1st, 2nd, ..., 7th
       case 'eo':
-        return localize.ordinalNumber(localDayOfWeek, {unit: 'day'})
+          return localize.ordinalNumber(localDayOfWeek, {unit: 'day'});
       case 'eee':
-        return localize.day(dayOfWeek, {width: 'abbreviated', context: 'formatting'})
+          return localize.day(dayOfWeek, {width: 'abbreviated', context: 'formatting'});
       // T
       case 'eeeee':
-        return localize.day(dayOfWeek, {width: 'narrow', context: 'formatting'})
+          return localize.day(dayOfWeek, {width: 'narrow', context: 'formatting'});
       // Tu
       case 'eeeeee':
-        return localize.day(dayOfWeek, {width: 'short', context: 'formatting'})
+          return localize.day(dayOfWeek, {width: 'short', context: 'formatting'});
       // Tuesday
       case 'eeee':
       default:
@@ -51109,21 +51161,21 @@ var formatters = {
     switch (token) {
       // Numerical value (same as in `e`)
       case 'c':
-        return String(localDayOfWeek)
+          return String(localDayOfWeek);
       // Padded numberical value
       case 'cc':
-        return addLeadingZeros(localDayOfWeek, token.length)
+          return addLeadingZeros(localDayOfWeek, token.length);
       // 1st, 2nd, ..., 7th
       case 'co':
-        return localize.ordinalNumber(localDayOfWeek, {unit: 'day'})
+          return localize.ordinalNumber(localDayOfWeek, {unit: 'day'});
       case 'ccc':
-        return localize.day(dayOfWeek, {width: 'abbreviated', context: 'standalone'})
+          return localize.day(dayOfWeek, {width: 'abbreviated', context: 'standalone'});
       // T
       case 'ccccc':
-        return localize.day(dayOfWeek, {width: 'narrow', context: 'standalone'})
+          return localize.day(dayOfWeek, {width: 'narrow', context: 'standalone'});
       // Tu
       case 'cccccc':
-        return localize.day(dayOfWeek, {width: 'short', context: 'standalone'})
+          return localize.day(dayOfWeek, {width: 'short', context: 'standalone'});
       // Tuesday
       case 'cccc':
       default:
@@ -51138,22 +51190,22 @@ var formatters = {
     switch (token) {
       // 2
       case 'i':
-        return String(isoDayOfWeek)
+          return String(isoDayOfWeek);
       // 02
       case 'ii':
-        return addLeadingZeros(isoDayOfWeek, token.length)
+          return addLeadingZeros(isoDayOfWeek, token.length);
       // 2nd
       case 'io':
-        return localize.ordinalNumber(isoDayOfWeek, {unit: 'day'})
+          return localize.ordinalNumber(isoDayOfWeek, {unit: 'day'});
       // Tue
       case 'iii':
-        return localize.day(dayOfWeek, {width: 'abbreviated', context: 'formatting'})
+          return localize.day(dayOfWeek, {width: 'abbreviated', context: 'formatting'});
       // T
       case 'iiiii':
-        return localize.day(dayOfWeek, {width: 'narrow', context: 'formatting'})
+          return localize.day(dayOfWeek, {width: 'narrow', context: 'formatting'});
       // Tu
       case 'iiiiii':
-        return localize.day(dayOfWeek, {width: 'short', context: 'formatting'})
+          return localize.day(dayOfWeek, {width: 'short', context: 'formatting'});
       // Tuesday
       case 'iiii':
       default:
@@ -51170,9 +51222,9 @@ var formatters = {
       case 'a':
       case 'aa':
       case 'aaa':
-        return localize.dayPeriod(dayPeriodEnumValue, {width: 'abbreviated', context: 'formatting'})
+          return localize.dayPeriod(dayPeriodEnumValue, {width: 'abbreviated', context: 'formatting'});
       case 'aaaaa':
-        return localize.dayPeriod(dayPeriodEnumValue, {width: 'narrow', context: 'formatting'})
+          return localize.dayPeriod(dayPeriodEnumValue, {width: 'narrow', context: 'formatting'});
       case 'aaaa':
       default:
         return localize.dayPeriod(dayPeriodEnumValue, {width: 'wide', context: 'formatting'})
@@ -51195,9 +51247,9 @@ var formatters = {
       case 'b':
       case 'bb':
       case 'bbb':
-        return localize.dayPeriod(dayPeriodEnumValue, {width: 'abbreviated', context: 'formatting'})
+          return localize.dayPeriod(dayPeriodEnumValue, {width: 'abbreviated', context: 'formatting'});
       case 'bbbbb':
-        return localize.dayPeriod(dayPeriodEnumValue, {width: 'narrow', context: 'formatting'})
+          return localize.dayPeriod(dayPeriodEnumValue, {width: 'narrow', context: 'formatting'});
       case 'bbbb':
       default:
         return localize.dayPeriod(dayPeriodEnumValue, {width: 'wide', context: 'formatting'})
@@ -51222,9 +51274,9 @@ var formatters = {
       case 'B':
       case 'BB':
       case 'BBB':
-        return localize.dayPeriod(dayPeriodEnumValue, {width: 'abbreviated', context: 'formatting'})
+          return localize.dayPeriod(dayPeriodEnumValue, {width: 'abbreviated', context: 'formatting'});
       case 'BBBBB':
-        return localize.dayPeriod(dayPeriodEnumValue, {width: 'narrow', context: 'formatting'})
+          return localize.dayPeriod(dayPeriodEnumValue, {width: 'narrow', context: 'formatting'});
       case 'BBBB':
       default:
         return localize.dayPeriod(dayPeriodEnumValue, {width: 'wide', context: 'formatting'})
@@ -51325,14 +51377,14 @@ var formatters = {
     switch (token) {
       // Hours and optional minutes
       case 'X':
-        return formatTimezoneWithOptionalMinutes(timezoneOffset)
+          return formatTimezoneWithOptionalMinutes(timezoneOffset);
 
       // Hours, minutes and optional seconds without `:` delimeter
       // Note: neither ISO-8601 nor JavaScript supports seconds in timezone offsets
       // so this token always has the same output as `XX`
       case 'XXXX':
       case 'XX': // Hours and minutes without `:` delimeter
-        return formatTimezone(timezoneOffset)
+          return formatTimezone(timezoneOffset);
 
       // Hours, minutes and optional seconds with `:` delimeter
       // Note: neither ISO-8601 nor JavaScript supports seconds in timezone offsets
@@ -51352,14 +51404,14 @@ var formatters = {
     switch (token) {
       // Hours and optional minutes
       case 'x':
-        return formatTimezoneWithOptionalMinutes(timezoneOffset)
+          return formatTimezoneWithOptionalMinutes(timezoneOffset);
 
       // Hours, minutes and optional seconds without `:` delimeter
       // Note: neither ISO-8601 nor JavaScript supports seconds in timezone offsets
       // so this token always has the same output as `xx`
       case 'xxxx':
       case 'xx': // Hours and minutes without `:` delimeter
-        return formatTimezone(timezoneOffset)
+          return formatTimezone(timezoneOffset);
 
       // Hours, minutes and optional seconds with `:` delimeter
       // Note: neither ISO-8601 nor JavaScript supports seconds in timezone offsets
@@ -51381,7 +51433,7 @@ var formatters = {
       case 'O':
       case 'OO':
       case 'OOO':
-        return 'GMT' + formatTimezoneShort(timezoneOffset, ':')
+          return 'GMT' + formatTimezoneShort(timezoneOffset, ':');
       // Long
       case 'OOOO':
       default:
@@ -51399,7 +51451,7 @@ var formatters = {
       case 'z':
       case 'zz':
       case 'zzz':
-        return 'GMT' + formatTimezoneShort(timezoneOffset, ':')
+          return 'GMT' + formatTimezoneShort(timezoneOffset, ':');
       // Long
       case 'zzzz':
       default:
@@ -51463,11 +51515,11 @@ function formatTimezoneShort (offset, dirtyDelimeter) {
 function dateLongFormatter (pattern, formatLong, options) {
   switch (pattern) {
     case 'P':
-      return formatLong.date({width: 'short'})
+        return formatLong.date({width: 'short'});
     case 'PP':
-      return formatLong.date({width: 'medium'})
+        return formatLong.date({width: 'medium'});
     case 'PPP':
-      return formatLong.date({width: 'long'})
+        return formatLong.date({width: 'long'});
     case 'PPPP':
     default:
       return formatLong.date({width: 'full'})
@@ -51477,11 +51529,11 @@ function dateLongFormatter (pattern, formatLong, options) {
 function timeLongFormatter (pattern, formatLong, options) {
   switch (pattern) {
     case 'p':
-      return formatLong.time({width: 'short'})
+        return formatLong.time({width: 'short'});
     case 'pp':
-      return formatLong.time({width: 'medium'})
+        return formatLong.time({width: 'medium'});
     case 'ppp':
-      return formatLong.time({width: 'long'})
+        return formatLong.time({width: 'long'});
     case 'pppp':
     default:
       return formatLong.time({width: 'full'})
@@ -51502,13 +51554,13 @@ function dateTimeLongFormatter (pattern, formatLong, options) {
   switch (datePattern) {
     case 'P':
       dateTimeFormat = formatLong.dateTime({width: 'short'});
-      break
+        break;
     case 'PP':
       dateTimeFormat = formatLong.dateTime({width: 'medium'});
-      break
+        break;
     case 'PPP':
       dateTimeFormat = formatLong.dateTime({width: 'long'});
-      break
+        break;
     case 'PPPP':
     default:
       dateTimeFormat = formatLong.dateTime({width: 'full'});
@@ -52295,13 +52347,13 @@ function parseAnyDigitsSigned (string, valueCallback) {
 function parseNDigits (n, string, valueCallback) {
   switch (n) {
     case 1:
-      return parseNumericPattern(numericPatterns.singleDigit, string, valueCallback)
+        return parseNumericPattern(numericPatterns.singleDigit, string, valueCallback);
     case 2:
-      return parseNumericPattern(numericPatterns.twoDigits, string, valueCallback)
+        return parseNumericPattern(numericPatterns.twoDigits, string, valueCallback);
     case 3:
-      return parseNumericPattern(numericPatterns.threeDigits, string, valueCallback)
+        return parseNumericPattern(numericPatterns.threeDigits, string, valueCallback);
     case 4:
-      return parseNumericPattern(numericPatterns.fourDigits, string, valueCallback)
+        return parseNumericPattern(numericPatterns.fourDigits, string, valueCallback);
     default:
       return parseNumericPattern(new RegExp('^\\d{1,' + n + '}'), string, valueCallback)
   }
@@ -52310,13 +52362,13 @@ function parseNDigits (n, string, valueCallback) {
 function parseNDigitsSigned (n, string, valueCallback) {
   switch (n) {
     case 1:
-      return parseNumericPattern(numericPatterns.singleDigitSigned, string, valueCallback)
+        return parseNumericPattern(numericPatterns.singleDigitSigned, string, valueCallback);
     case 2:
-      return parseNumericPattern(numericPatterns.twoDigitsSigned, string, valueCallback)
+        return parseNumericPattern(numericPatterns.twoDigitsSigned, string, valueCallback);
     case 3:
-      return parseNumericPattern(numericPatterns.threeDigitsSigned, string, valueCallback)
+        return parseNumericPattern(numericPatterns.threeDigitsSigned, string, valueCallback);
     case 4:
-      return parseNumericPattern(numericPatterns.fourDigitsSigned, string, valueCallback)
+        return parseNumericPattern(numericPatterns.fourDigitsSigned, string, valueCallback);
     default:
       return parseNumericPattern(new RegExp('^-?\\d{1,' + n + '}'), string, valueCallback)
   }
@@ -52325,13 +52377,13 @@ function parseNDigitsSigned (n, string, valueCallback) {
 function dayPeriodEnumToHours (enumValue) {
   switch (enumValue) {
     case 'morning':
-      return 4
+        return 4;
     case 'evening':
-      return 17
+        return 17;
     case 'pm':
     case 'noon':
     case 'afternoon':
-      return 12
+        return 12;
     case 'am':
     case 'midnight':
     case 'night':
@@ -52423,10 +52475,10 @@ var parsers = {
         case 'GG':
         case 'GGG':
           return match.era(string, {width: 'abbreviated'}) ||
-            match.era(string, {width: 'narrow'})
+              match.era(string, {width: 'narrow'});
         // A, B
         case 'GGGGG':
-          return match.era(string, {width: 'narrow'})
+            return match.era(string, {width: 'narrow'});
         // Anno Domini, Before Christ
         case 'GGGG':
         default:
@@ -52465,9 +52517,9 @@ var parsers = {
 
       switch (token) {
         case 'y':
-          return parseNDigits(4, string, valueCallback)
+            return parseNDigits(4, string, valueCallback);
         case 'yo':
-          return match.ordinalNumber(string, {unit: 'year', valueCallback: valueCallback})
+            return match.ordinalNumber(string, {unit: 'year', valueCallback: valueCallback});
         default:
           return parseNDigits(token.length, string, valueCallback)
       }
@@ -52505,9 +52557,9 @@ var parsers = {
 
       switch (token) {
         case 'Y':
-          return parseNDigits(4, string, valueCallback)
+            return parseNDigits(4, string, valueCallback);
         case 'Yo':
-          return match.ordinalNumber(string, {unit: 'year', valueCallback: valueCallback})
+            return match.ordinalNumber(string, {unit: 'year', valueCallback: valueCallback});
         default:
           return parseNDigits(token.length, string, valueCallback)
       }
@@ -52575,17 +52627,17 @@ var parsers = {
         // 1, 2, 3, 4
         case 'Q':
         case 'QQ': // 01, 02, 03, 04
-          return parseNDigits(token.length, string)
+            return parseNDigits(token.length, string);
         // 1st, 2nd, 3rd, 4th
         case 'Qo':
-          return match.ordinalNumber(string, {unit: 'quarter'})
+            return match.ordinalNumber(string, {unit: 'quarter'});
         // Q1, Q2, Q3, Q4
         case 'QQQ':
           return match.quarter(string, {width: 'abbreviated', context: 'formatting'}) ||
-            match.quarter(string, {width: 'narrow', context: 'formatting'})
+              match.quarter(string, {width: 'narrow', context: 'formatting'});
         // 1, 2, 3, 4 (narrow quarter; could be not numerical)
         case 'QQQQQ':
-          return match.quarter(string, {width: 'narrow', context: 'formatting'})
+            return match.quarter(string, {width: 'narrow', context: 'formatting'});
         // 1st quarter, 2nd quarter, ...
         case 'QQQQ':
         default:
@@ -52612,17 +52664,17 @@ var parsers = {
         // 1, 2, 3, 4
         case 'q':
         case 'qq': // 01, 02, 03, 04
-          return parseNDigits(token.length, string)
+            return parseNDigits(token.length, string);
         // 1st, 2nd, 3rd, 4th
         case 'qo':
-          return match.ordinalNumber(string, {unit: 'quarter'})
+            return match.ordinalNumber(string, {unit: 'quarter'});
         // Q1, Q2, Q3, Q4
         case 'qqq':
           return match.quarter(string, {width: 'abbreviated', context: 'standalone'}) ||
-            match.quarter(string, {width: 'narrow', context: 'standalone'})
+              match.quarter(string, {width: 'narrow', context: 'standalone'});
         // 1, 2, 3, 4 (narrow quarter; could be not numerical)
         case 'qqqqq':
-          return match.quarter(string, {width: 'narrow', context: 'standalone'})
+            return match.quarter(string, {width: 'narrow', context: 'standalone'});
         // 1st quarter, 2nd quarter, ...
         case 'qqqq':
         default:
@@ -52652,20 +52704,20 @@ var parsers = {
       switch (token) {
         // 1, 2, ..., 12
         case 'M':
-          return parseNumericPattern(numericPatterns.month, string, valueCallback)
+            return parseNumericPattern(numericPatterns.month, string, valueCallback);
         // 01, 02, ..., 12
         case 'MM':
-          return parseNDigits(2, string, valueCallback)
+            return parseNDigits(2, string, valueCallback);
         // 1st, 2nd, ..., 12th
         case 'Mo':
-          return match.ordinalNumber(string, {unit: 'month', valueCallback: valueCallback})
+            return match.ordinalNumber(string, {unit: 'month', valueCallback: valueCallback});
         // Jan, Feb, ..., Dec
         case 'MMM':
           return match.month(string, {width: 'abbreviated', context: 'formatting'}) ||
-            match.month(string, {width: 'narrow', context: 'formatting'})
+              match.month(string, {width: 'narrow', context: 'formatting'});
         // J, F, ..., D
         case 'MMMMM':
-          return match.month(string, {width: 'narrow', context: 'formatting'})
+            return match.month(string, {width: 'narrow', context: 'formatting'});
         // January, February, ..., December
         case 'MMMM':
         default:
@@ -52695,20 +52747,20 @@ var parsers = {
       switch (token) {
         // 1, 2, ..., 12
         case 'L':
-          return parseNumericPattern(numericPatterns.month, string, valueCallback)
+            return parseNumericPattern(numericPatterns.month, string, valueCallback);
         // 01, 02, ..., 12
         case 'LL':
-          return parseNDigits(2, string, valueCallback)
+            return parseNDigits(2, string, valueCallback);
         // 1st, 2nd, ..., 12th
         case 'Lo':
-          return match.ordinalNumber(string, {unit: 'month', valueCallback: valueCallback})
+            return match.ordinalNumber(string, {unit: 'month', valueCallback: valueCallback});
         // Jan, Feb, ..., Dec
         case 'LLL':
           return match.month(string, {width: 'abbreviated', context: 'standalone'}) ||
-            match.month(string, {width: 'narrow', context: 'standalone'})
+              match.month(string, {width: 'narrow', context: 'standalone'});
         // J, F, ..., D
         case 'LLLLL':
-          return match.month(string, {width: 'narrow', context: 'standalone'})
+            return match.month(string, {width: 'narrow', context: 'standalone'});
         // January, February, ..., December
         case 'LLLL':
         default:
@@ -52733,9 +52785,9 @@ var parsers = {
     parse: function (string, token, match, options) {
       switch (token) {
         case 'w':
-          return parseNumericPattern(numericPatterns.week, string)
+            return parseNumericPattern(numericPatterns.week, string);
         case 'wo':
-          return match.ordinalNumber(string, {unit: 'week'})
+            return match.ordinalNumber(string, {unit: 'week'});
         default:
           return parseNDigits(token.length, string)
       }
@@ -52754,9 +52806,9 @@ var parsers = {
     parse: function (string, token, match, options) {
       switch (token) {
         case 'I':
-          return parseNumericPattern(numericPatterns.week, string)
+            return parseNumericPattern(numericPatterns.week, string);
         case 'Io':
-          return match.ordinalNumber(string, {unit: 'week'})
+            return match.ordinalNumber(string, {unit: 'week'});
         default:
           return parseNDigits(token.length, string)
       }
@@ -52775,9 +52827,9 @@ var parsers = {
     parse: function (string, token, match, options) {
       switch (token) {
         case 'd':
-          return parseNumericPattern(numericPatterns.date, string)
+            return parseNumericPattern(numericPatterns.date, string);
         case 'do':
-          return match.ordinalNumber(string, {unit: 'date'})
+            return match.ordinalNumber(string, {unit: 'date'});
         default:
           return parseNDigits(token.length, string)
       }
@@ -52806,9 +52858,9 @@ var parsers = {
       switch (token) {
         case 'D':
         case 'DD':
-          return parseNumericPattern(numericPatterns.dayOfYear, string)
+            return parseNumericPattern(numericPatterns.dayOfYear, string);
         case 'Do':
-          return match.ordinalNumber(string, {unit: 'date'})
+            return match.ordinalNumber(string, {unit: 'date'});
         default:
           return parseNDigits(token.length, string)
       }
@@ -52840,14 +52892,14 @@ var parsers = {
         case 'EEE':
           return match.day(string, {width: 'abbreviated', context: 'formatting'}) ||
             match.day(string, {width: 'short', context: 'formatting'}) ||
-            match.day(string, {width: 'narrow', context: 'formatting'})
+              match.day(string, {width: 'narrow', context: 'formatting'});
         // T
         case 'EEEEE':
-          return match.day(string, {width: 'narrow', context: 'formatting'})
+            return match.day(string, {width: 'narrow', context: 'formatting'});
         // Tu
         case 'EEEEEE':
           return match.day(string, {width: 'short', context: 'formatting'}) ||
-          match.day(string, {width: 'narrow', context: 'formatting'})
+              match.day(string, {width: 'narrow', context: 'formatting'});
         // Tuesday
         case 'EEEE':
         default:
@@ -52880,22 +52932,22 @@ var parsers = {
         // 3
         case 'e':
         case 'ee': // 03
-          return parseNDigits(token.length, string, valueCallback)
+            return parseNDigits(token.length, string, valueCallback);
         // 3rd
         case 'eo':
-          return match.ordinalNumber(string, {unit: 'day', valueCallback: valueCallback})
+            return match.ordinalNumber(string, {unit: 'day', valueCallback: valueCallback});
         // Tue
         case 'eee':
           return match.day(string, {width: 'abbreviated', context: 'formatting'}) ||
             match.day(string, {width: 'short', context: 'formatting'}) ||
-            match.day(string, {width: 'narrow', context: 'formatting'})
+              match.day(string, {width: 'narrow', context: 'formatting'});
         // T
         case 'eeeee':
-          return match.day(string, {width: 'narrow', context: 'formatting'})
+            return match.day(string, {width: 'narrow', context: 'formatting'});
         // Tu
         case 'eeeeee':
           return match.day(string, {width: 'short', context: 'formatting'}) ||
-          match.day(string, {width: 'narrow', context: 'formatting'})
+              match.day(string, {width: 'narrow', context: 'formatting'});
         // Tuesday
         case 'eeee':
         default:
@@ -52928,22 +52980,22 @@ var parsers = {
         // 3
         case 'c':
         case 'cc': // 03
-          return parseNDigits(token.length, string, valueCallback)
+            return parseNDigits(token.length, string, valueCallback);
         // 3rd
         case 'co':
-          return match.ordinalNumber(string, {unit: 'day', valueCallback: valueCallback})
+            return match.ordinalNumber(string, {unit: 'day', valueCallback: valueCallback});
         // Tue
         case 'ccc':
           return match.day(string, {width: 'abbreviated', context: 'standalone'}) ||
             match.day(string, {width: 'short', context: 'standalone'}) ||
-            match.day(string, {width: 'narrow', context: 'standalone'})
+              match.day(string, {width: 'narrow', context: 'standalone'});
         // T
         case 'ccccc':
-          return match.day(string, {width: 'narrow', context: 'standalone'})
+            return match.day(string, {width: 'narrow', context: 'standalone'});
         // Tu
         case 'cccccc':
           return match.day(string, {width: 'short', context: 'standalone'}) ||
-          match.day(string, {width: 'narrow', context: 'standalone'})
+              match.day(string, {width: 'narrow', context: 'standalone'});
         // Tuesday
         case 'cccc':
         default:
@@ -52978,22 +53030,22 @@ var parsers = {
         // 2
         case 'i':
         case 'ii': // 02
-          return parseNDigits(token.length, string)
+            return parseNDigits(token.length, string);
         // 2nd
         case 'io':
-          return match.ordinalNumber(string, {unit: 'day'})
+            return match.ordinalNumber(string, {unit: 'day'});
         // Tue
         case 'iii':
           return match.day(string, {width: 'abbreviated', context: 'formatting', valueCallback: valueCallback}) ||
             match.day(string, {width: 'short', context: 'formatting', valueCallback: valueCallback}) ||
-            match.day(string, {width: 'narrow', context: 'formatting', valueCallback: valueCallback})
+              match.day(string, {width: 'narrow', context: 'formatting', valueCallback: valueCallback});
         // T
         case 'iiiii':
-          return match.day(string, {width: 'narrow', context: 'formatting', valueCallback: valueCallback})
+            return match.day(string, {width: 'narrow', context: 'formatting', valueCallback: valueCallback});
         // Tu
         case 'iiiiii':
           return match.day(string, {width: 'short', context: 'formatting', valueCallback: valueCallback}) ||
-          match.day(string, {width: 'narrow', context: 'formatting', valueCallback: valueCallback})
+              match.day(string, {width: 'narrow', context: 'formatting', valueCallback: valueCallback});
         // Tuesday
         case 'iiii':
         default:
@@ -53022,9 +53074,9 @@ var parsers = {
         case 'aa':
         case 'aaa':
           return match.dayPeriod(string, {width: 'abbreviated', context: 'formatting'}) ||
-            match.dayPeriod(string, {width: 'narrow', context: 'formatting'})
+              match.dayPeriod(string, {width: 'narrow', context: 'formatting'});
         case 'aaaaa':
-          return match.dayPeriod(string, {width: 'narrow', context: 'formatting'})
+            return match.dayPeriod(string, {width: 'narrow', context: 'formatting'});
         case 'aaaa':
         default:
           return match.dayPeriod(string, {width: 'wide', context: 'formatting'}) ||
@@ -53047,9 +53099,9 @@ var parsers = {
         case 'bb':
         case 'bbb':
           return match.dayPeriod(string, {width: 'abbreviated', context: 'formatting'}) ||
-            match.dayPeriod(string, {width: 'narrow', context: 'formatting'})
+              match.dayPeriod(string, {width: 'narrow', context: 'formatting'});
         case 'bbbbb':
-          return match.dayPeriod(string, {width: 'narrow', context: 'formatting'})
+            return match.dayPeriod(string, {width: 'narrow', context: 'formatting'});
         case 'bbbb':
         default:
           return match.dayPeriod(string, {width: 'wide', context: 'formatting'}) ||
@@ -53072,9 +53124,9 @@ var parsers = {
         case 'BB':
         case 'BBB':
           return match.dayPeriod(string, {width: 'abbreviated', context: 'formatting'}) ||
-            match.dayPeriod(string, {width: 'narrow', context: 'formatting'})
+              match.dayPeriod(string, {width: 'narrow', context: 'formatting'});
         case 'BBBBB':
-          return match.dayPeriod(string, {width: 'narrow', context: 'formatting'})
+            return match.dayPeriod(string, {width: 'narrow', context: 'formatting'});
         case 'BBBB':
         default:
           return match.dayPeriod(string, {width: 'wide', context: 'formatting'}) ||
@@ -53094,9 +53146,9 @@ var parsers = {
     parse: function (string, token, match, options) {
       switch (token) {
         case 'h':
-          return parseNumericPattern(numericPatterns.hour12h, string)
+            return parseNumericPattern(numericPatterns.hour12h, string);
         case 'ho':
-          return match.ordinalNumber(string, {unit: 'hour'})
+            return match.ordinalNumber(string, {unit: 'hour'});
         default:
           return parseNDigits(token.length, string)
       }
@@ -53123,9 +53175,9 @@ var parsers = {
     parse: function (string, token, match, options) {
       switch (token) {
         case 'H':
-          return parseNumericPattern(numericPatterns.hour23h, string)
+            return parseNumericPattern(numericPatterns.hour23h, string);
         case 'Ho':
-          return match.ordinalNumber(string, {unit: 'hour'})
+            return match.ordinalNumber(string, {unit: 'hour'});
         default:
           return parseNDigits(token.length, string)
       }
@@ -53145,9 +53197,9 @@ var parsers = {
     parse: function (string, token, match, options) {
       switch (token) {
         case 'K':
-          return parseNumericPattern(numericPatterns.hour11h, string)
+            return parseNumericPattern(numericPatterns.hour11h, string);
         case 'Ko':
-          return match.ordinalNumber(string, {unit: 'hour'})
+            return match.ordinalNumber(string, {unit: 'hour'});
         default:
           return parseNDigits(token.length, string)
       }
@@ -53172,9 +53224,9 @@ var parsers = {
     parse: function (string, token, match, options) {
       switch (token) {
         case 'k':
-          return parseNumericPattern(numericPatterns.hour24h, string)
+            return parseNumericPattern(numericPatterns.hour24h, string);
         case 'ko':
-          return match.ordinalNumber(string, {unit: 'hour'})
+            return match.ordinalNumber(string, {unit: 'hour'});
         default:
           return parseNDigits(token.length, string)
       }
@@ -53195,9 +53247,9 @@ var parsers = {
     parse: function (string, token, match, options) {
       switch (token) {
         case 'm':
-          return parseNumericPattern(numericPatterns.minute, string)
+            return parseNumericPattern(numericPatterns.minute, string);
         case 'mo':
-          return match.ordinalNumber(string, {unit: 'minute'})
+            return match.ordinalNumber(string, {unit: 'minute'});
         default:
           return parseNDigits(token.length, string)
       }
@@ -53217,9 +53269,9 @@ var parsers = {
     parse: function (string, token, match, options) {
       switch (token) {
         case 's':
-          return parseNumericPattern(numericPatterns.second, string)
+            return parseNumericPattern(numericPatterns.second, string);
         case 'so':
-          return match.ordinalNumber(string, {unit: 'second'})
+            return match.ordinalNumber(string, {unit: 'second'});
         default:
           return parseNDigits(token.length, string)
       }
@@ -53254,13 +53306,13 @@ var parsers = {
     parse: function (string, token, match, options) {
       switch (token) {
         case 'X':
-          return parseTimezonePattern(timezonePatterns.basicOptionalMinutes, string)
+            return parseTimezonePattern(timezonePatterns.basicOptionalMinutes, string);
         case 'XX':
-          return parseTimezonePattern(timezonePatterns.basic, string)
+            return parseTimezonePattern(timezonePatterns.basic, string);
         case 'XXXX':
-          return parseTimezonePattern(timezonePatterns.basicOptionalSeconds, string)
+            return parseTimezonePattern(timezonePatterns.basicOptionalSeconds, string);
         case 'XXXXX':
-          return parseTimezonePattern(timezonePatterns.extendedOptionalSeconds, string)
+            return parseTimezonePattern(timezonePatterns.extendedOptionalSeconds, string);
         case 'XXX':
         default:
           return parseTimezonePattern(timezonePatterns.extended, string)
@@ -53277,13 +53329,13 @@ var parsers = {
     parse: function (string, token, match, options) {
       switch (token) {
         case 'x':
-          return parseTimezonePattern(timezonePatterns.basicOptionalMinutes, string)
+            return parseTimezonePattern(timezonePatterns.basicOptionalMinutes, string);
         case 'xx':
-          return parseTimezonePattern(timezonePatterns.basic, string)
+            return parseTimezonePattern(timezonePatterns.basic, string);
         case 'xxxx':
-          return parseTimezonePattern(timezonePatterns.basicOptionalSeconds, string)
+            return parseTimezonePattern(timezonePatterns.basicOptionalSeconds, string);
         case 'xxxxx':
-          return parseTimezonePattern(timezonePatterns.extendedOptionalSeconds, string)
+            return parseTimezonePattern(timezonePatterns.extendedOptionalSeconds, string);
         case 'xxx':
         default:
           return parseTimezonePattern(timezonePatterns.extended, string)
@@ -56232,9 +56284,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
 var render = function() {
-  var _vm = this
-  var _h = _vm.$createElement
-  var _c = _vm._self._c || _h
+    var _vm = this;
+    var _h = _vm.$createElement;
+    var _c = _vm._self._c || _h;
   return _c("div", [
     _c(
       "nav",
@@ -56309,7 +56361,7 @@ var render = function() {
                                 attrs: { href: "" },
                                 on: {
                                   click: function($event) {
-                                    $event.preventDefault()
+                                      $event.preventDefault();
                                     return _vm.$auth.logout()
                                   }
                                 }
@@ -56363,12 +56415,17 @@ var render = function() {
           "uk-img": ""
         }
       },
-      [_c("router-view")],
-      1
+        [
+            _vm.$auth.ready()
+                ? _c("div", [_c("router-view")], 1)
+                : _c("div", {staticClass: "uk-position-center"}, [
+                    _c("h1", [_vm._v("Please wait whilst the site is loading.")])
+                ])
+        ]
     )
   ])
-}
-var staticRenderFns = []
+};
+        var staticRenderFns = [];
 render._withStripped = true
 
 
@@ -56387,160 +56444,196 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
 var render = function() {
-  var _vm = this
-  var _h = _vm.$createElement
-  var _c = _vm._self._c || _h
+    var _vm = this;
+    var _h = _vm.$createElement;
+    var _c = _vm._self._c || _h;
   return _c("div", { staticClass: "uk-overflow-hidden" }, [
-    _c(
-      "div",
-      {
-        staticClass:
-          "uk-container uk-background-primary uk-border-rounded uk-margin-large-top uk-margin-remove-top@s uk-padding"
-      },
-      [
-        _c("h1", { staticClass: "uk-text-center" }, [_vm._v("Contact")]),
-        _vm._v(" "),
-        _c("form", { staticClass: "uk-form-horizontal uk-margin-large" }, [
-          _c("div", { staticClass: "uk-margin" }, [
-            _c(
-              "label",
-              { staticClass: "uk-form-label", attrs: { for: "fullName" } },
-              [_vm._v("Full Name")]
-            ),
-            _vm._v(" "),
-            _c("div", { staticClass: "uk-form-controls" }, [
-              _c("input", {
-                directives: [
-                  {
-                    name: "model",
-                    rawName: "v-model",
-                    value: _vm.fullName,
-                    expression: "fullName"
-                  },
-                  {
-                    name: "validate",
-                    rawName: "v-validate",
-                    value: "required",
-                    expression: "'required'"
-                  }
-                ],
-                staticClass: "uk-input uk-border-rounded",
-                attrs: {
-                  id: "fullName",
-                  name: "fullName",
-                  type: "text",
-                  placeholder: "Full Name"
-                },
-                domProps: { value: _vm.fullName },
-                on: {
-                  input: function($event) {
-                    if ($event.target.composing) {
-                      return
-                    }
-                    _vm.fullName = $event.target.value
-                  }
-                }
-              }),
+      !_vm.success
+          ? _c(
+          "div",
+          {
+              staticClass:
+                  "uk-container uk-background-primary uk-border-rounded uk-margin-large-top uk-margin-remove-top@s uk-padding"
+          },
+          [
+              _c("h1", {staticClass: "uk-text-center"}, [_vm._v("Contact")]),
               _vm._v(" "),
-              _c("span", [_vm._v(_vm._s(_vm.errors.first("fullName")))])
-            ])
-          ]),
-          _vm._v(" "),
-          _c("div", { staticClass: "uk-margin" }, [
-            _c(
-              "label",
-              { staticClass: "uk-form-label", attrs: { for: "emailAddress" } },
-              [_vm._v("Email")]
-            ),
-            _vm._v(" "),
-            _c("div", { staticClass: "uk-form-controls" }, [
-              _c("input", {
-                directives: [
-                  {
-                    name: "model",
-                    rawName: "v-model",
-                    value: _vm.emailAddress,
-                    expression: "emailAddress"
-                  },
-                  {
-                    name: "validate",
-                    rawName: "v-validate",
-                    value: "required|email",
-                    expression: "'required|email'"
-                  }
-                ],
-                staticClass: "uk-input uk-border-rounded",
-                attrs: {
-                  id: "emailAddress",
-                  name: "emailAddress",
-                  type: "text",
-                  placeholder: "Email"
-                },
-                domProps: { value: _vm.emailAddress },
-                on: {
-                  input: function($event) {
-                    if ($event.target.composing) {
-                      return
-                    }
-                    _vm.emailAddress = $event.target.value
-                  }
-                }
-              }),
-              _vm._v(" "),
-              _c("span", [_vm._v(_vm._s(_vm.errors.first("emailAddress")))])
-            ])
-          ]),
-          _vm._v(" "),
-          _c("div", { staticClass: "uk-margin" }, [
-            _c(
-              "label",
-              { staticClass: "uk-form-label", attrs: { for: "message" } },
-              [_vm._v("Your Message")]
-            ),
-            _vm._v(" "),
-            _c("div", { staticClass: "uk-form-controls" }, [
-              _c("textarea", {
-                directives: [
-                  {
-                    name: "model",
-                    rawName: "v-model",
-                    value: _vm.message,
-                    expression: "message"
-                  },
-                  {
-                    name: "validate",
-                    rawName: "v-validate",
-                    value: "required",
-                    expression: "'required'"
-                  }
-                ],
-                staticClass: "uk-textarea uk-border-rounded",
-                attrs: {
-                  placeholder: "Your Message",
-                  name: "message",
-                  id: "message",
-                  rows: "10"
-                },
-                domProps: { value: _vm.message },
-                on: {
-                  input: function($event) {
-                    if ($event.target.composing) {
-                      return
-                    }
-                    _vm.message = $event.target.value
-                  }
-                }
-              }),
-              _vm._v(" "),
-              _c("span", [_vm._v(_vm._s(_vm.errors.first("message")))])
-            ])
-          ])
-        ])
-      ]
-    )
+              _c("form", {staticClass: "uk-form-horizontal uk-margin-large"}, [
+                  _c("div", {staticClass: "uk-margin"}, [
+                      _c(
+                          "label",
+                          {staticClass: "uk-form-label", attrs: {for: "fullName"}},
+                          [_vm._v("Full Name")]
+                      ),
+                      _vm._v(" "),
+                      _c("div", {staticClass: "uk-form-controls"}, [
+                          _c("input", {
+                              directives: [
+                                  {
+                                      name: "model",
+                                      rawName: "v-model",
+                                      value: _vm.fullName,
+                                      expression: "fullName"
+                                  },
+                                  {
+                                      name: "validate",
+                                      rawName: "v-validate",
+                                      value: "required",
+                                      expression: "'required'"
+                                  }
+                              ],
+                              staticClass: "uk-input uk-border-rounded",
+                              attrs: {
+                                  id: "fullName",
+                                  name: "fullName",
+                                  type: "text",
+                                  placeholder: "Full Name"
+                              },
+                              domProps: {value: _vm.fullName},
+                              on: {
+                                  input: function ($event) {
+                                      if ($event.target.composing) {
+                                          return
+                                      }
+                                      _vm.fullName = $event.target.value
+                                  }
+                              }
+                          }),
+                          _vm._v(" "),
+                          _c("span", [_vm._v(_vm._s(_vm.errors.first("fullName")))])
+                      ])
+                  ]),
+                  _vm._v(" "),
+                  _c("div", {staticClass: "uk-margin"}, [
+                      _c(
+                          "label",
+                          {
+                              staticClass: "uk-form-label",
+                              attrs: {for: "emailAddress"}
+                          },
+                          [_vm._v("Email")]
+                      ),
+                      _vm._v(" "),
+                      _c("div", {staticClass: "uk-form-controls"}, [
+                          _c("input", {
+                              directives: [
+                                  {
+                                      name: "model",
+                                      rawName: "v-model",
+                                      value: _vm.emailAddress,
+                                      expression: "emailAddress"
+                                  },
+                                  {
+                                      name: "validate",
+                                      rawName: "v-validate",
+                                      value: "required|email",
+                                      expression: "'required|email'"
+                                  }
+                              ],
+                              staticClass: "uk-input uk-border-rounded",
+                              attrs: {
+                                  id: "emailAddress",
+                                  name: "emailAddress",
+                                  type: "text",
+                                  placeholder: "Email"
+                              },
+                              domProps: {value: _vm.emailAddress},
+                              on: {
+                                  input: function ($event) {
+                                      if ($event.target.composing) {
+                                          return
+                                      }
+                                      _vm.emailAddress = $event.target.value
+                                  }
+                              }
+                          }),
+                          _vm._v(" "),
+                          _c("span", [_vm._v(_vm._s(_vm.errors.first("emailAddress")))])
+                      ])
+                  ]),
+                  _vm._v(" "),
+                  _c("div", {staticClass: "uk-margin"}, [
+                      _c(
+                          "label",
+                          {staticClass: "uk-form-label", attrs: {for: "message"}},
+                          [_vm._v("Your Message")]
+                      ),
+                      _vm._v(" "),
+                      _c("div", {staticClass: "uk-form-controls"}, [
+                          _c("textarea", {
+                              directives: [
+                                  {
+                                      name: "model",
+                                      rawName: "v-model",
+                                      value: _vm.message,
+                                      expression: "message"
+                                  },
+                                  {
+                                      name: "validate",
+                                      rawName: "v-validate",
+                                      value: "required|max:8096",
+                                      expression: "'required|max:8096'"
+                                  }
+                              ],
+                              staticClass: "uk-textarea uk-border-rounded",
+                              attrs: {
+                                  placeholder: "Your Message",
+                                  name: "message",
+                                  id: "message",
+                                  rows: "10"
+                              },
+                              domProps: {value: _vm.message},
+                              on: {
+                                  input: function ($event) {
+                                      if ($event.target.composing) {
+                                          return
+                                      }
+                                      _vm.message = $event.target.value
+                                  }
+                              }
+                          }),
+                          _vm._v(" "),
+                          _c("span", [_vm._v(_vm._s(_vm.errors.first("message")))])
+                      ])
+                  ]),
+                  _vm._v(" "),
+                  _c("div", {staticClass: "uk-margin"}, [
+                      _c("div", {staticClass: "uk-form-controls"}, [
+                          _c(
+                              "button",
+                              {
+                                  staticClass:
+                                      "uk-button uk-button-default uk-border-rounded uk-align-center uk-margin-remove-bottom",
+                                  attrs: {type: "submit"},
+                                  on: {
+                                      click: function ($event) {
+                                          $event.preventDefault();
+                                          return _vm.sendMessage($event)
+                                      }
+                                  }
+                              },
+                              [_vm._v("Send Message")]
+                          )
+                      ])
+                  ])
+              ])
+          ]
+          )
+          : _c(
+          "div",
+          {
+              staticClass:
+                  "uk-container uk-background-primary uk-border-rounded uk-margin-large-top uk-margin-remove-top@s uk-padding"
+          },
+          [
+              _c("h1", {staticClass: "uk-align-center"}, [
+                  _vm._v("Your message has been send.")
+              ])
+          ]
+          )
   ])
-}
-var staticRenderFns = []
+};
+        var staticRenderFns = [];
 render._withStripped = true
 
 
@@ -56559,14 +56652,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
 var render = function() {
-  var _vm = this
-  var _h = _vm.$createElement
-  var _c = _vm._self._c || _h
+    var _vm = this;
+    var _h = _vm.$createElement;
+    var _c = _vm._self._c || _h;
   return _c("h1", { staticClass: "uk-text-center uk-position-center" }, [
     _vm._v("Image Gallery")
   ])
-}
-var staticRenderFns = []
+};
+        var staticRenderFns = [];
 render._withStripped = true
 
 
@@ -56585,9 +56678,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
 var render = function() {
-  var _vm = this
-  var _h = _vm.$createElement
-  var _c = _vm._self._c || _h
+    var _vm = this;
+    var _h = _vm.$createElement;
+    var _c = _vm._self._c || _h;
   return _c("div", { staticClass: "uk-container" }, [
     _c(
       "div",
@@ -56605,7 +56698,7 @@ var render = function() {
             attrs: { autocomplete: "off", method: "post" },
             on: {
               submit: function($event) {
-                $event.preventDefault()
+                  $event.preventDefault();
                 return _vm.login($event)
               }
             }
@@ -56715,8 +56808,8 @@ var render = function() {
       ]
     )
   ])
-}
-var staticRenderFns = []
+};
+        var staticRenderFns = [];
 render._withStripped = true
 
 
@@ -56735,9 +56828,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
 var render = function() {
-  var _vm = this
-  var _h = _vm.$createElement
-  var _c = _vm._self._c || _h
+    var _vm = this;
+    var _h = _vm.$createElement;
+    var _c = _vm._self._c || _h;
   return _c("div", { staticClass: "uk-container" }, [
     _c(
       "div",
@@ -56755,7 +56848,7 @@ var render = function() {
             attrs: { autocomplete: "off", method: "post" },
             on: {
               submit: function($event) {
-                $event.preventDefault()
+                  $event.preventDefault();
                 return _vm.register($event)
               }
             }
@@ -56961,8 +57054,8 @@ var render = function() {
       ]
     )
   ])
-}
-var staticRenderFns = []
+};
+        var staticRenderFns = [];
 render._withStripped = true
 
 
@@ -56998,12 +57091,12 @@ function normalizeComponent (
   // Vue.extend constructor export interop
   var options = typeof scriptExports === 'function'
     ? scriptExports.options
-    : scriptExports
+      : scriptExports;
 
   // render functions
   if (render) {
-    options.render = render
-    options.staticRenderFns = staticRenderFns
+      options.render = render;
+      options.staticRenderFns = staticRenderFns;
     options._compiled = true
   }
 
@@ -57017,14 +57110,14 @@ function normalizeComponent (
     options._scopeId = 'data-v-' + scopeId
   }
 
-  var hook
+    var hook;
   if (moduleIdentifier) { // server build
     hook = function (context) {
       // 2.3 injection
       context =
         context || // cached call
         (this.$vnode && this.$vnode.ssrContext) || // stateful
-        (this.parent && this.parent.$vnode && this.parent.$vnode.ssrContext) // functional
+          (this.parent && this.parent.$vnode && this.parent.$vnode.ssrContext); // functional
       // 2.2 with runInNewContext: true
       if (!context && typeof __VUE_SSR_CONTEXT__ !== 'undefined') {
         context = __VUE_SSR_CONTEXT__
@@ -57037,7 +57130,7 @@ function normalizeComponent (
       if (context && context._registeredComponents) {
         context._registeredComponents.add(moduleIdentifier)
       }
-    }
+    };
     // used by ssr in case component is cached and beforeCreate
     // never gets called
     options._ssrRegister = hook
@@ -57051,16 +57144,16 @@ function normalizeComponent (
     if (options.functional) {
       // for template-only hot-reload because in that case the render fn doesn't
       // go through the normalizer
-      options._injectStyles = hook
+        options._injectStyles = hook;
       // register for functioal component in vue file
-      var originalRender = options.render
+        var originalRender = options.render;
       options.render = function renderWithStyleInjection (h, context) {
-        hook.call(context)
+          hook.call(context);
         return originalRender(h, context)
       }
     } else {
       // inject component registration as beforeCreate hook
-      var existing = options.beforeCreate
+        var existing = options.beforeCreate;
       options.beforeCreate = existing
         ? [].concat(existing, hook)
         : [hook]
@@ -57219,18 +57312,18 @@ var View = {
 
     return h(component, data, children)
   }
-}
+};
 
 function resolveProps (route, config) {
   switch (typeof config) {
     case 'undefined':
-      return
+        return;
     case 'object':
-      return config
+        return config;
     case 'function':
-      return config(route)
+        return config(route);
     case 'boolean':
-      return config ? route.params : undefined
+        return config ? route.params : undefined;
     default:
       if (true) {
         warn(
@@ -57579,7 +57672,7 @@ var Link = {
 
     return h(this.tag, data, this.$slots.default)
   }
-}
+};
 
 function guardEvent (e) {
   // don't redirect with control keys
@@ -59567,13 +59660,13 @@ var VueRouter = function VueRouter (options) {
   switch (mode) {
     case 'history':
       this.history = new HTML5History(this, options.base);
-      break
+        break;
     case 'hash':
       this.history = new HashHistory(this, options.base, this.fallback);
-      break
+        break;
     case 'abstract':
       this.history = new AbstractHistory(this, options.base);
-      break
+        break;
     default:
       if (true) {
         assert(false, ("invalid mode: " + mode));
@@ -60656,7 +60749,7 @@ methodsToPatch.forEach(function (method) {
       case 'push':
       case 'unshift':
         inserted = args;
-        break
+          break;
       case 'splice':
         inserted = args.slice(2);
         break
@@ -66626,14 +66719,30 @@ function parseFilters (exp) {
       }
     } else {
       switch (c) {
-        case 0x22: inDouble = true; break         // "
-        case 0x27: inSingle = true; break         // '
-        case 0x60: inTemplateString = true; break // `
-        case 0x28: paren++; break                 // (
-        case 0x29: paren--; break                 // )
-        case 0x5B: square++; break                // [
-        case 0x5D: square--; break                // ]
-        case 0x7B: curly++; break                 // {
+          case 0x22:
+              inDouble = true;
+              break;         // "
+          case 0x27:
+              inSingle = true;
+              break;         // '
+          case 0x60:
+              inTemplateString = true;
+              break; // `
+          case 0x28:
+              paren++;
+              break;                 // (
+          case 0x29:
+              paren--;
+              break;                 // )
+          case 0x5B:
+              square++;
+              break;                // [
+          case 0x5D:
+              square--;
+              break;                // ]
+          case 0x7B:
+              curly++;
+              break;                 // {
         case 0x7D: curly--; break                 // }
       }
       if (c === 0x2f) { // /
@@ -72073,12 +72182,11 @@ var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_
   null,
   null,
   null
-  
-)
+);
 
 /* hot reload */
 if (false) { var api; }
-component.options.__file = "resources/js/views/App.vue"
+        component.options.__file = "resources/js/views/App.vue";
 /* harmony default export */ __webpack_exports__["default"] = (component.exports);
 
 /***/ }),
@@ -72142,12 +72250,11 @@ var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_
   null,
   null,
   null
-  
-)
+);
 
 /* hot reload */
 if (false) { var api; }
-component.options.__file = "resources/js/views/Contact.vue"
+        component.options.__file = "resources/js/views/Contact.vue";
 /* harmony default export */ __webpack_exports__["default"] = (component.exports);
 
 /***/ }),
@@ -72211,12 +72318,11 @@ var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_
   null,
   null,
   null
-  
-)
+);
 
 /* hot reload */
 if (false) { var api; }
-component.options.__file = "resources/js/views/Home.vue"
+        component.options.__file = "resources/js/views/Home.vue";
 /* harmony default export */ __webpack_exports__["default"] = (component.exports);
 
 /***/ }),
@@ -72280,12 +72386,11 @@ var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_
   null,
   null,
   null
-  
-)
+);
 
 /* hot reload */
 if (false) { var api; }
-component.options.__file = "resources/js/views/Login.vue"
+        component.options.__file = "resources/js/views/Login.vue";
 /* harmony default export */ __webpack_exports__["default"] = (component.exports);
 
 /***/ }),
@@ -72349,12 +72454,11 @@ var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_
   null,
   null,
   null
-  
-)
+);
 
 /* hot reload */
 if (false) { var api; }
-component.options.__file = "resources/js/views/Register.vue"
+        component.options.__file = "resources/js/views/Register.vue";
 /* harmony default export */ __webpack_exports__["default"] = (component.exports);
 
 /***/ }),
