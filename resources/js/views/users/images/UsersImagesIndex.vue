@@ -35,7 +35,7 @@
                         <div class="uk-grid-small uk-child-width-1-1 uk-child-width-1-3@m uk-child-width-1-4@l uk-child-width-1-5@xl" uk-grid uk-lightbox="animation: slide">
                             <div class="imageContainer" v-for="(image, key) in reversedItems">
                                 <span @click="EditImage(image.id)" class="uk-icon-button uk-button-default editImageIcon" uk-icon="icon: pencil"></span>
-                                <a :data-caption="image.description" :href="image.url" class="imageThumbnail">
+                                <a :data-caption="image.description != null ? image.description : ''" :href="image.url" class="imageThumbnail">
                                     <v-lazy-image :alt="image.name" :src="image.url" class="uk-width-1-1"></v-lazy-image>
                                 </a>
                             </div>
@@ -175,7 +175,7 @@
             UploadImage() {
                 const file = this.files[0];
                 let formData = new FormData();
-                formData.append('files[' + 0 + ']', file);
+                formData.append('newImage', file);
                 this.files.splice(0, 1);
                 if (file.type === 'image/png' || file.type === 'image/jpeg' || file.type === 'image/jpg') {
                     this.runningUploads = this.runningUploads + 1;
@@ -185,8 +185,8 @@
                             'Content-Type': 'multipart/form-data',
                             'Authorization': `Bearer ${this.$auth.token()}`
                         }
-                    }).then(function () {
-                        if (app.files.length === 0) {
+                    }).then(response => {
+                        if (app.files.length === 0 && app.runningUploads <= 1) {
                             window.UIkit.notification({
                                 message: 'Images have been uploaded.',
                                 status: 'success',
@@ -194,8 +194,9 @@
                                 timeout: 2500
                             });
                         }
+                        app.images.push(response.data.data);
                         app.runningUploads = app.runningUploads - 1;
-                    }).catch(function () {
+                    }).catch(response => {
                         if (app.files.length === 0) {
                             window.UIkit.notification({
                                 message: 'Images have been uploaded with errors.',

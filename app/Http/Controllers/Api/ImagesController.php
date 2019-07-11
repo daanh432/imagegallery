@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\ImageResource;
 use App\Images;
 use App\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
@@ -38,14 +39,29 @@ class ImagesController extends Controller
 
     /**
      * Store a newly created resource in storage.
-     *
      * @param Request $request
-     * @return Response
+     * @param User $user
+     * @return JsonResponse|AnonymousResourceCollection
      */
     public function store(Request $request, User $user)
     {
-        dd($request->files);
-//        return response()->json(['status' => 'success', 'message' => 'testing']);
+        $validator = Validator::make($request->all(), [
+            'newImage' => ['required', 'image', 'mimetypes:image/jpeg,image/jpg,image/png', 'max:10240']
+        ]);
+        if ($validator->fails() || !$request->file('newImage')->isValid()) {
+            return response()->json([
+                'status' => 'error',
+                'errors' => $validator->errors()
+            ], 422);
+        } else {
+            $image = new Images();
+            $image->name = $request->file('newImage')->getClientOriginalName();
+            $image->description = null;
+            $image->url = $request->file('newImage')->store('images/' . $user->id . '/', 'public');
+            $image->user_id = $user->id;
+            $image->save();
+            return new ImageResource($image);
+        }
     }
 
     /**
@@ -57,8 +73,7 @@ class ImagesController extends Controller
      */
     public function update(Request $request, User $user, Images $image)
     {
-        $validator = Validator::make(
-            $request->all(), [
+        $validator = Validator::make($request->all(), [
             'name' => 'nullable',
             'description' => 'nullable'
         ]);
@@ -75,17 +90,22 @@ class ImagesController extends Controller
         return response()->json([
             'status' => 'success',
             'data' => $image,
-        ]);
+        ], 200);
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param Images $images
+     * @param User $user
+     * @param Images $image
      * @return Response
      */
-    public function destroy(Images $images)
+    public function destroy(User $user, Images $image)
     {
-        //
+        $image->delete();
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Image successfully deleted'
+        ], 200);
     }
 }
