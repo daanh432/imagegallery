@@ -80,7 +80,7 @@ const routes = [
         name: 'users.images.index',
         component: Images,
         meta: {
-            auth: {roles: 2}
+            auth: true
         }
     }
 ];

@@ -44,7 +44,8 @@ class ImagesController extends Controller
      */
     public function store(Request $request, User $user)
     {
-        //
+        dd($request->files);
+//        return response()->json(['status' => 'success', 'message' => 'testing']);
     }
 
     /**

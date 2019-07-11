@@ -1,7 +1,7 @@
 <template>
     <div>
         <div ref="ImageEditModal" uk-modal v-on:hidden="ResetEditForm">
-            <div class="uk-modal-dialog uk-modal-body" v-if="selectedImageId">
+            <div class="uk-modal-dialog uk-modal-body" v-if="selectedImageId != null">
                 <h2 class="uk-modal-title">Update Image Information</h2>
                 <img :alt="images[selectedImageId].url" :src="images[selectedImageId].url">
                 <form class="uk-form-blank">
@@ -28,34 +28,41 @@
         </div>
 
         <div class="uk-overflow-hidden">
-            <div class="uk-container uk-background-primary uk-border-rounded uk-margin-large-top uk-padding">
-                <h1 class="uk-text-center">Images</h1>
-                <div v-if="!has_error">
-                    <div class="uk-grid-small uk-child-width-1-1 uk-child-width-1-3@m uk-child-width-1-4@l uk-child-width-1-5@xl" uk-grid uk-lightbox="animation: slide">
-                        <div class="imageContainer" v-for="(image, key) in images">
-                            <span @click="EditImage(key)" class="uk-icon-button uk-button-default editImageIcon" uk-icon="icon: pencil"></span>
-                            <a :data-caption="image.description" :href="image.url" class="imageThumbnail">
-                                <v-lazy-image :alt="image.name" :src="image.url" class="uk-width-1-1"></v-lazy-image>
-                            </a>
+            <form ref="fileform">
+                <div class="uk-container uk-background-primary uk-border-rounded uk-margin-large-top uk-padding">
+                    <h1 class="uk-text-center">Images</h1>
+                    <div v-if="!has_error">
+                        <div class="uk-grid-small uk-child-width-1-1 uk-child-width-1-3@m uk-child-width-1-4@l uk-child-width-1-5@xl" uk-grid uk-lightbox="animation: slide">
+                            <div class="imageContainer" v-for="(image, key) in reversedItems">
+                                <span @click="EditImage(image.id)" class="uk-icon-button uk-button-default editImageIcon" uk-icon="icon: pencil"></span>
+                                <a :data-caption="image.description" :href="image.url" class="imageThumbnail">
+                                    <v-lazy-image :alt="image.name" :src="image.url" class="uk-width-1-1"></v-lazy-image>
+                                </a>
+                            </div>
                         </div>
-                    </div>
-                    <div class="uk-text-center" uk-grid v-if="meta">
-                        <div class="uk-width-1-3@m">
-                            <button @click="goToPrev" class="uk-button uk-button-default" v-if="prevPage">Previous</button>
-                        </div>
-                        <div class="uk-width-1-3@m">
-                            <p v-text="paginatonCount"></p>
-                        </div>
-                        <div class="uk-width-1-3@m">
-                            <button @click="goToNext" class="uk-button uk-button-default" v-if="nextPage">Next</button>
+                        <div class="uk-text-center" uk-grid v-if="meta">
+                            <div class="uk-width-1-3@m">
+                                <button @click="goToPrev" class="uk-button uk-button-default" v-if="prevPage">Previous</button>
+                            </div>
+                            <div class="uk-width-1-3@m">
+                                <p v-text="paginatonCount"></p>
+                            </div>
+                            <div class="uk-width-1-3@m">
+                                <button @click="goToNext" class="uk-button uk-button-default" v-if="nextPage">Next</button>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </form>
         </div>
     </div>
 </template>
 <script>
+    const determineDragAndDropCapable = () => {
+        let div = document.createElement('div');
+        return (('draggable' in div) || ('ondragstart' in div && 'ondrop' in div)) && 'FormData' in window && 'FileReader' in window;
+    };
+
     const getImages = (params, token, callback) => {
         axios.get(`users/${params.userId}/images`, {
             params, headers: {
@@ -71,17 +78,24 @@
     export default {
         data() {
             return {
-                updated: false,
-                editing: false,
-                selectedImageId: null,
-                selectedImageBackup: null,
+                userId: null,
+                dragAndDropCapable: false,
                 has_error: false,
                 images: [],
-                meta: null
+                meta: null,
+                updated: false,
+                selectedImageId: null,
+                selectedImageBackup: null,
+                files: [],
+                uploadPercentage: 0,
+                runningUploads: 0
             }
         },
 
         computed: {
+            reversedItems() {
+                return this.images.slice().reverse();
+            },
             nextPage() {
                 if (!this.meta || this.meta.current_page >= this.meta.last_page) {
                     return;
@@ -105,17 +119,26 @@
             },
         },
 
+        watch: {
+            runningUploads() {
+                if (this != null && this.runningUploads != null && this.runningUploads < 4 && this.files.length > 0) {
+                    this.UploadImage();
+                }
+            }
+        },
+
         methods: {
             ResetEditForm() {
                 this.updated === false ? this.images[this.selectedImageId] = this.selectedImageBackup : null;
-                this.editing = false;
                 this.selectedImageId = null;
                 this.selectedImageBackup = null;
             },
             EditImage(key) {
-                this.editing = true;
-                this.selectedImageId = key;
+                this.selectedImageId = this.images.findIndex(obj => {
+                    return obj.id === key;
+                });
                 this.selectedImageBackup = Object.assign({}, this.images[this.selectedImageId]);
+                console.log(this.images[this.selectedImageId]);
                 window.UIkit.modal(this.$refs.ImageEditModal).show();
             },
             UpdateImage() {
@@ -126,7 +149,7 @@
                         'description': this.images[this.selectedImageId].description,
                         '_method': 'PATCH'
                     };
-                    axios.post(`users/${this.$auth.user().id}/images/${this.images[this.selectedImageId].id}`, data, {
+                    axios.post(`users/${this.userId}/images/${this.images[this.selectedImageId].id}`, data, {
                         headers: {
                             'Authorization': `Bearer ${token}`
                         }
@@ -147,6 +170,50 @@
                             timeout: 5000
                         });
                     });
+                }
+            },
+            UploadImage() {
+                const file = this.files[0];
+                let formData = new FormData();
+                formData.append('files[' + 0 + ']', file);
+                this.files.splice(0, 1);
+                if (file.type === 'image/png' || file.type === 'image/jpeg' || file.type === 'image/jpg') {
+                    this.runningUploads = this.runningUploads + 1;
+                    let app = this;
+                    axios.post(`users/${this.userId}/images`, formData, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                            'Authorization': `Bearer ${this.$auth.token()}`
+                        }
+                    }).then(function () {
+                        if (app.files.length === 0) {
+                            window.UIkit.notification({
+                                message: 'Images have been uploaded.',
+                                status: 'success',
+                                pos: 'bottom-center',
+                                timeout: 2500
+                            });
+                        }
+                        app.runningUploads = app.runningUploads - 1;
+                    }).catch(function () {
+                        if (app.files.length === 0) {
+                            window.UIkit.notification({
+                                message: 'Images have been uploaded with errors.',
+                                status: 'warning',
+                                pos: 'bottom-center',
+                                timeout: 2500
+                            });
+                        }
+                        app.runningUploads = app.runningUploads - 1;
+                    });
+                } else {
+                    window.UIkit.notification({
+                        message: `${file.name.split('.').pop()} is not supported. Only png, jpg, jpeg are supported.`,
+                        status: 'warning',
+                        pos: 'bottom-right',
+                        timeout: 0
+                    });
+                    this.UploadImage();
                 }
             },
             goToNext() {
@@ -196,6 +263,27 @@
                 this.setData(err, data);
                 next();
             });
+        },
+
+        mounted() {
+            this.userId = this.$route != null && this.$route.params != null && this.$route.params.userId != null ? this.$route.params.userId : window.VueAPP.$auth.user().id;
+            this.dragAndDropCapable = determineDragAndDropCapable();
+            if (this.dragAndDropCapable) {
+                ['drag', 'dragstart', 'dragend', 'dragover', 'dragenter', 'dragleave', 'drop'].forEach(function (evt) {
+                    this.$refs.fileform.addEventListener(evt, function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }.bind(this), false);
+                }.bind(this));
+
+                this.$refs.fileform.addEventListener('drop', function (e) {
+                    for (let i = 0; i < e.dataTransfer.files.length; i++) {
+                        this.files.push(e.dataTransfer.files[i]);
+                    }
+                    // Upload instantly
+                    this.UploadImage();
+                }.bind(this));
+            }
         },
     }
 </script>

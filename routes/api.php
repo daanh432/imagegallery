@@ -34,6 +34,7 @@ Route::namespace('Api')->group(function () {
 
         // User image overview routes
         Route::get('/users/{user}/images', 'ImagesController@index');
+        Route::post('/users/{user}/images', 'ImagesController@store');
         Route::patch('/users/{user}/images/{image}', 'ImagesController@update');
     });
 });
