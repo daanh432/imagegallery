@@ -9,6 +9,9 @@
     <link rel="stylesheet" type="text/css" href="{{ mix('assets/css/app.css') }}" crossorigin="anonymous">
 </head>
 <body>
+<div id="pageBackground">
+    <img data-src="{{ asset('/assets/img/background.jpg') }}" alt="Background image of website" uk-img>
+</div>
 <div id="app">
     <app></app>
 </div>

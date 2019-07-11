@@ -26,10 +26,15 @@ Route::namespace('Api')->group(function () {
     // Send contact email route
     Route::post('/contact', 'ContactController@create');
 
-    // User routes
+    // Logged in routes
     Route::group(['middleware' => 'auth:api'], function () {
+        // User profile routes
         Route::get('/users', 'UserController@index');
         Route::get('/users/{user}', 'UserController@show');
+
+        // User image overview routes
+        Route::get('/users/{user}/images', 'ImagesController@index');
+        Route::patch('/users/{user}/images/{image}', 'ImagesController@update');
     });
 });
 

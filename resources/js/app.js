@@ -3,6 +3,7 @@ import VueAuth from '@websanova/vue-auth'
 import VueAxios from 'vue-axios'
 import VueRouter from 'vue-router'
 import VeeValidate from 'vee-validate'
+import {VLazyImagePlugin} from "v-lazy-image";
 import App from './views/App'
 import auth from './auth'
 import router from './router'
@@ -13,6 +14,7 @@ window.Vue = require('vue');
 Vue.router = router;
 Vue.use(VueRouter);
 Vue.use(VeeValidate);
+Vue.use(VLazyImagePlugin);
 // Set Vue authentication
 Vue.use(VueAxios, axios);
 axios.defaults.baseURL = `${process.env.MIX_APP_URL}/api`;
