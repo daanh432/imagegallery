@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="stylesheet" type="text/css" href="{{ mix('assets/css/app.css') }}" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="{{ url(mix('/assets/css/app.css')) }}" crossorigin="anonymous">
 </head>
 <body>
 <div id="pageBackground">
@@ -15,6 +15,6 @@
 <div id="app">
     <app></app>
 </div>
-<script src="{{ mix('assets/js/app.js') }}" crossorigin="anonymous"></script>
+<script src="{{ url(mix('/assets/js/app.js')) }}" crossorigin="anonymous"></script>
 </body>
 </html>
