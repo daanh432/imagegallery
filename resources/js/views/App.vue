@@ -15,11 +15,11 @@
             <div class="uk-navbar-right">
                 <ul class="uk-navbar-nav">
                     <li v-if="$auth.check()">
-                        <router-link :to="{ name: 'account.show' }">{{ $auth.user().name }}</router-link>
+                        <router-link :to="{ name: 'users.show', params: {userId: $auth.user().id} }">{{ $auth.user().name }}</router-link>
                         <div class="uk-navbar-dropdown">
                             <ul class="uk-nav uk-navbar-dropdown-nav">
                                 <li>
-                                    <router-link :to="{ name: 'account.images' }">Images</router-link>
+                                    <router-link :to="{ name: 'users.images.index', params: {userId: $auth.user().id}}">Images</router-link>
                                 </li>
                                 <li>
                                     <a href="" @click.prevent="$auth.logout()">Logout</a>

@@ -1,6 +1,6 @@
 <template>
     <div class="uk-overflow-hidden">
-        <div class="uk-container uk-background-primary uk-border-rounded uk-margin-large-top uk-margin-remove-top@s uk-padding" v-if="!success">
+        <div class="uk-container uk-background-primary uk-border-rounded uk-margin-large-top uk-padding uk-width-1-2@l" v-if="!success">
             <h1 class="uk-text-center">Contact</h1>
             <form class="uk-form-horizontal uk-margin-large">
 

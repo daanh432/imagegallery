@@ -15,11 +15,12 @@ Vue.use(VueRouter);
 Vue.use(VeeValidate);
 // Set Vue authentication
 Vue.use(VueAxios, axios);
-axios.defaults.baseURL = `http://imagegallery.test/api`;
+axios.defaults.baseURL = `${process.env.MIX_APP_URL}/api`;
+axios.defaults.headers.common['Content-Type'] = `application/json`;
 Vue.use(VueAuth, auth);
 // Load Index
 Vue.component('app', App);
-const app = new Vue({
+window.VueAPP = new Vue({
     el: '#app',
     router
 });

@@ -11,5 +11,7 @@
 |
 */
 
+Route::get('/api', 'SpaController@NotFound');
+
 Route::get('/', 'SpaController@index')->name('index');
 Route::get('/{any}', 'SpaController@index')->where('any', '.*');

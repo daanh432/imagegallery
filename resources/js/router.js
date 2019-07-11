@@ -4,6 +4,9 @@ import Home from './views/Home'
 import Contact from './views/Contact'
 import Register from './views/Register'
 import Login from './views/Login'
+import User from './views/users/UsersShow'
+import Users from './views/users/UsersIndex'
+import Images from './views/users/images/UsersImagesIndex'
 // Routes
 const routes = [
     {
@@ -37,29 +40,49 @@ const routes = [
         meta: {
             auth: false
         }
+    },
+// USER ROUTES
+    {
+        path: '/dashboard',
+        name: 'dashboard.show',
+        component: User,
+        meta: {
+            auth: true
+        }
+    },
+    {
+        path: '/images',
+        name: 'images.index',
+        component: Images,
+        meta: {
+            auth: true
+        }
+    },
+// ADMIN ROUTES
+    {
+        path: '/users',
+        name: 'users.index',
+        component: Users,
+        meta: {
+            auth: {roles: 2}
+        }
+    },
+    {
+        path: '/users/:userId',
+        name: 'users.show',
+        component: User,
+        meta: {
+            auth: true
+        }
+    },
+    {
+        path: '/users/:userId/images',
+        name: 'users.images.index',
+        component: Images,
+        meta: {
+            auth: {roles: 2}
+        }
     }
-
-// // USER ROUTES
-//
-//     {
-//         path: '/dashboard',
-//         name: 'dashboard',
-//         component: Dashboard,
-//         meta: {
-//             auth: true
-//         }
-//     },
-//
-// // ADMIN ROUTES
-//
-//     {
-//         path: '/admin',
-//         name: 'admin.dashboard',
-//         component: AdminDashboard,
-//         meta: {
-//             auth: {roles: 2, redirect: {name: 'login'}, forbiddenRedirect: '/403'}
-//         }
-//     },
 ];
 
 const router = new VueRouter({

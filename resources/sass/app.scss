@@ -11,8 +11,13 @@ $navbar-nav-item-text-transform: none; // Disable all capital letters on navbar 
 $navbar-background: #707070;
 
 // 1.3 Button styling
+$global-button-default-text-color: #FFFFFF;
 $button-default-background: $primary-green;
-$button-default-color: #FFFFFF;
+$button-default-color: $global-button-default-text-color;
+$button-default-active-background: darken($primary-green, 15%);
+$button-default-active-color: $global-button-default-text-color;
+$button-default-hover-background: darken($primary-green, 15%);
+$button-default-hover-color: $global-button-default-text-color;
 $button-text-transform: none;
 
 $background-primary-background: #FFFFFF;

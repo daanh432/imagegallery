@@ -8,7 +8,7 @@ const config = {
     auth: bearer,
     http: axios,
     router: router,
-    tokenDefaultName: 'ImageGallery-Auth-Token',
+    tokenDefaultName: 'ImageGallery-Auth-Token', // THIS CAN NOT BE CHANGED!
     tokenStore: ['localStorage'],
     rolesVar: 'role',
     registerData: {url: 'auth/register', method: 'POST', redirect: '/login'},
