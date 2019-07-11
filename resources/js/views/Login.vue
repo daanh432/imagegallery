@@ -47,7 +47,7 @@
                 let redirect = this.$auth.redirect();
                 let app = this;
                 this.$auth.login({
-                    params: {
+                    data: {
                         email: app.email,
                         password: app.password
                     },
