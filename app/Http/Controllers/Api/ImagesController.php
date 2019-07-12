@@ -113,6 +113,8 @@ class ImagesController extends Controller
      */
     public function destroy(User $user, Images $image)
     {
+        Storage::disk('public')->delete($image->url);
+        Storage::disk('public')->delete($image->thumbUrl);
         $image->delete();
         return response()->json([
             'status' => 'success',
