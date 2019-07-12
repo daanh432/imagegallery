@@ -36,7 +36,7 @@
                             <div class="imageContainer" v-for="(image, key) in reversedItems">
                                 <span @click="EditImage(image.id)" class="uk-icon-button uk-button-default editImageIcon" uk-icon="icon: pencil"></span>
                                 <a :data-caption="image.description != null ? image.description : ''" :href="image.url" class="imageThumbnail">
-                                    <v-lazy-image :alt="image.name" :src="image.url" class="uk-width-1-1"></v-lazy-image>
+                                    <v-lazy-image :alt="image.name" :src="image.thumbUrl" class="uk-width-1-1"></v-lazy-image>
                                 </a>
                             </div>
                         </div>

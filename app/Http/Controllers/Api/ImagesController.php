@@ -11,7 +11,10 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
+use Intervention\Image\Facades\Image;
 
 class ImagesController extends Controller
 {
@@ -41,7 +44,7 @@ class ImagesController extends Controller
      * Store a newly created resource in storage.
      * @param Request $request
      * @param User $user
-     * @return JsonResponse|AnonymousResourceCollection
+     * @return ImageResource|JsonResponse
      */
     public function store(Request $request, User $user)
     {
@@ -54,10 +57,18 @@ class ImagesController extends Controller
                 'errors' => $validator->errors()
             ], 422);
         } else {
+            $normalImage = (string)Image::make($request->file('newImage'))->encode('jpg', 80);
+            $thumbImage = (string)Image::make($request->file('newImage'))->resize(1000, null, function ($constraint) {
+                $constraint->aspectRatio();
+                $constraint->upsize();
+            })->encode('jpg', 70);
+            $path = 'images/' . $user->id . '/' . Str::random(10) . '_' . $request->file('newImage')->hashName();
+            $thumbPath = 'images/' . $user->id . '/thumb/' . Str::random(10) . '_' . $request->file('newImage')->hashName();
             $image = new Images();
             $image->name = $request->file('newImage')->getClientOriginalName();
             $image->description = null;
-            $image->url = $request->file('newImage')->store('images/' . $user->id . '/', 'public');
+            $image->url = Storage::disk('public')->put($path, $normalImage) ? $path : null;
+            $image->thumbUrl = Storage::disk('public')->put($thumbPath, $thumbImage) ? $thumbPath : null;
             $image->user_id = $user->id;
             $image->save();
             return new ImageResource($image);
