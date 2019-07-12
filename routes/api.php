@@ -36,6 +36,7 @@ Route::namespace('Api')->group(function () {
         Route::get('/users/{user}/images', 'ImagesController@index');
         Route::post('/users/{user}/images', 'ImagesController@store');
         Route::patch('/users/{user}/images/{image}', 'ImagesController@update');
+        Route::delete('/users/{user}/images/{image}', 'ImagesController@destroy');
     });
 });
 

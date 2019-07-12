@@ -21,45 +21,46 @@
                 </form>
 
                 <p class="uk-text-right">
-                    <button class="uk-button uk-button-default uk-modal-close" type="button">Cancel</button>
-                    <button @click="UpdateImage" class="uk-button uk-button-primary" type="button">Save</button>
+                    <button @click="DeleteImage(selectedImageId)" class="uk-button uk-button-danger" type="button">Delete</button>
+                    <button class="uk-button uk-button-muted uk-modal-close" type="button">Cancel</button>
+                    <button @click="UpdateImage" class="uk-button uk-button-default" type="button">Save</button>
                 </p>
             </div>
         </div>
 
+        <form id="dragAndDropForm" ref="fileform" v-if="!has_error"></form>
+
         <div class="uk-overflow-hidden" v-if="!has_error">
-            <form ref="fileform">
-                <div class="uk-container uk-background-primary uk-border-rounded uk-margin-large-top uk-padding">
-                    <h1 class="uk-text-center">Images</h1>
-                    <div class="uk-text-center uk-margin-bottom">
-                        <div uk-form-custom>
-                            <input multiple type="file" v-on:change="UploadDialog($event)">
-                            <button class="uk-button uk-button-small uk-button-default" tabindex="-1" type="button"><span uk-icon="icon: push"></span> Upload Images</button>
+            <div class="uk-container uk-background-primary uk-border-rounded uk-margin-large-top uk-padding">
+                <h1 class="uk-text-center">Images</h1>
+                <div class="uk-text-center uk-margin-bottom">
+                    <div uk-form-custom>
+                        <input multiple type="file" v-on:change="UploadDialog($event)">
+                        <button class="uk-button uk-button-small uk-button-default" tabindex="-1" type="button"><span uk-icon="icon: push"></span> Upload Images</button>
+                    </div>
+                </div>
+                <div>
+                    <div class="uk-grid-small uk-child-width-1-1 uk-child-width-1-3@m uk-child-width-1-4@l uk-child-width-1-5@xl" uk-grid uk-lightbox="animation: slide">
+                        <div class="imageContainer" v-for="(image, key) in reversedItems">
+                            <span @click="EditImage(image.id)" class="uk-icon-button uk-button-default editImageIcon" uk-icon="icon: pencil"></span>
+                            <a :data-caption="image.description != null ? image.description : ''" :href="image.url" class="imageThumbnail">
+                                <v-lazy-image :alt="image.name" :src="image.thumbUrl" class="uk-width-1-1"></v-lazy-image>
+                            </a>
                         </div>
                     </div>
-                    <div>
-                        <div class="uk-grid-small uk-child-width-1-1 uk-child-width-1-3@m uk-child-width-1-4@l uk-child-width-1-5@xl" uk-grid uk-lightbox="animation: slide">
-                            <div class="imageContainer" v-for="(image, key) in reversedItems">
-                                <span @click="EditImage(image.id)" class="uk-icon-button uk-button-default editImageIcon" uk-icon="icon: pencil"></span>
-                                <a :data-caption="image.description != null ? image.description : ''" :href="image.url" class="imageThumbnail">
-                                    <v-lazy-image :alt="image.name" :src="image.thumbUrl" class="uk-width-1-1"></v-lazy-image>
-                                </a>
-                            </div>
+                    <div class="uk-text-center" uk-grid v-if="meta">
+                        <div class="uk-width-1-3@m">
+                            <button @click="goToPrev" class="uk-button uk-button-default" v-if="prevPage">Previous</button>
                         </div>
-                        <div class="uk-text-center" uk-grid v-if="meta">
-                            <div class="uk-width-1-3@m">
-                                <button @click="goToPrev" class="uk-button uk-button-default" v-if="prevPage">Previous</button>
-                            </div>
-                            <div class="uk-width-1-3@m">
-                                <p v-text="paginatonCount"></p>
-                            </div>
-                            <div class="uk-width-1-3@m">
-                                <button @click="goToNext" class="uk-button uk-button-default" v-if="nextPage">Next</button>
-                            </div>
+                        <div class="uk-width-1-3@m">
+                            <p v-text="paginatonCount"></p>
+                        </div>
+                        <div class="uk-width-1-3@m">
+                            <button @click="goToNext" class="uk-button uk-button-default" v-if="nextPage">Next</button>
                         </div>
                     </div>
                 </div>
-            </form>
+            </div>
         </div>
         <div v-else>
             <div class="uk-container uk-background-primary uk-border-rounded uk-margin-large-top uk-padding">
@@ -149,7 +150,6 @@
                     return obj.id === key;
                 });
                 this.selectedImageBackup = Object.assign({}, this.images[this.selectedImageId]);
-                console.log(this.images[this.selectedImageId]);
                 window.UIkit.modal(this.$refs.ImageEditModal).show();
             },
             UpdateImage() {
@@ -180,6 +180,36 @@
                             pos: 'bottom-center',
                             timeout: 5000
                         });
+                    });
+                }
+            },
+            DeleteImage(key) {
+                if (this.selectedImageId != null) {
+                    let app = this;
+                    window.UIkit.modal.confirm(`Are you sure you want to delete the image ${this.images[key].name}`).then(function () {
+                        axios.post(`users/${app.userId}/images/${app.images[key].id}`, {
+                            '_method': 'DELETE',
+                            'Authorization': app.$auth.token()
+                        }).then(response => {
+                            app.images.splice(key, 1);
+                            app.updated = true;
+                            window.UIkit.notification({
+                                message: 'Image deleted successfully',
+                                status: 'success',
+                                pos: 'bottom-center',
+                                timeout: 2500
+                            });
+                        }).catch(response => {
+                            app.updated = false;
+                            window.UIkit.notification({
+                                message: 'Something went wrong trying to delete this image. Please try again later or contact us',
+                                status: 'danger',
+                                pos: 'bottom-center',
+                                timeout: 5000
+                            });
+                        });
+                    }, function () {
+                        // Do something or nothing if rejected
                     });
                 }
             },
