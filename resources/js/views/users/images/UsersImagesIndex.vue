@@ -31,6 +31,12 @@
             <form ref="fileform">
                 <div class="uk-container uk-background-primary uk-border-rounded uk-margin-large-top uk-padding">
                     <h1 class="uk-text-center">Images</h1>
+                    <div class="uk-text-center uk-margin-bottom">
+                        <div uk-form-custom>
+                            <input multiple type="file" v-on:change="UploadDialog($event)">
+                            <button class="uk-button uk-button-small uk-button-default" tabindex="-1" type="button"><span uk-icon="icon: push"></span> Upload Images</button>
+                        </div>
+                    </div>
                     <div v-if="!has_error">
                         <div class="uk-grid-small uk-child-width-1-1 uk-child-width-1-3@m uk-child-width-1-4@l uk-child-width-1-5@xl" uk-grid uk-lightbox="animation: slide">
                             <div class="imageContainer" v-for="(image, key) in reversedItems">
@@ -245,6 +251,14 @@
                     this.images = data.data;
                     this.meta = data.meta;
                 }
+            },
+            UploadDialog(e) {
+                let form = e.target;
+                for (let i = 0; i < form.files.length; i++) {
+                    this.files.push(form.files[i]);
+                }
+                // Upload instantly
+                this.UploadImage();
             }
         },
 
