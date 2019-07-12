@@ -35,6 +35,7 @@ body, html {
     margin: 0;
     padding: 0;
     height: 100%;
+    overflow: hidden;
 }
 
 .router-link-exact-active {
@@ -43,23 +44,25 @@ body, html {
 
 #pageBackground {
     position: fixed;
-    top: 0;
-    bottom: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
     z-index: -1000;
 }
 
 #pageBackground img {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: auto;
     min-width: 100%;
     min-height: 100%;
-    width: auto;
-    height: auto;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    z-index: -1000;
+    object-fit: cover;
+    object-position: center;
 }
 
 .imageContainer {
