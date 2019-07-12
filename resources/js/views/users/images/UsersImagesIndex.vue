@@ -27,7 +27,7 @@
             </div>
         </div>
 
-        <div class="uk-overflow-hidden">
+        <div class="uk-overflow-hidden" v-if="!has_error">
             <form ref="fileform">
                 <div class="uk-container uk-background-primary uk-border-rounded uk-margin-large-top uk-padding">
                     <h1 class="uk-text-center">Images</h1>
@@ -37,7 +37,7 @@
                             <button class="uk-button uk-button-small uk-button-default" tabindex="-1" type="button"><span uk-icon="icon: push"></span> Upload Images</button>
                         </div>
                     </div>
-                    <div v-if="!has_error">
+                    <div>
                         <div class="uk-grid-small uk-child-width-1-1 uk-child-width-1-3@m uk-child-width-1-4@l uk-child-width-1-5@xl" uk-grid uk-lightbox="animation: slide">
                             <div class="imageContainer" v-for="(image, key) in reversedItems">
                                 <span @click="EditImage(image.id)" class="uk-icon-button uk-button-default editImageIcon" uk-icon="icon: pencil"></span>
@@ -60,6 +60,11 @@
                     </div>
                 </div>
             </form>
+        </div>
+        <div v-else>
+            <div class="uk-container uk-background-primary uk-border-rounded uk-margin-large-top uk-padding">
+                <h1 class="uk-text-center">An error occurred during load. Please try again later.</h1>
+            </div>
         </div>
     </div>
 </template>

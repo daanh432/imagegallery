@@ -2,6 +2,7 @@
     <div>
         <div class="offcanvas-nav-primary" id="offCanvasMenu" uk-offcanvas="overlay: true; mode: reveal">
             <div class="uk-offcanvas-bar uk-flex uk-flex-column">
+                <router-link :to="{ name: 'home'}"><img :src="logoUrl" alt="Image Gallery Logo" class="uk-width-1-1"></router-link>
                 <ul class="uk-nav uk-nav-primary uk-margin-auto-vertical uk-iconnav uk-iconnav-vertical">
                     <li>
                         <router-link :to="{ name: 'home' }"><span uk-icon="icon: home; ratio: 2"></span> Home</router-link>
@@ -38,7 +39,7 @@
             <div class="uk-navbar-center">
                 <ul class="uk-navbar-nav">
                     <li>
-                        <router-link :to="{ name: 'home' }">ImageGallery</router-link>
+                        <router-link :to="{ name: 'home' }"><img :src="logoUrl" id="navbarLogoImage"></router-link>
                     </li>
                 </ul>
             </div>
@@ -53,5 +54,11 @@
     </div>
 </template>
 <script>
-    export default {}
+    export default {
+        data() {
+            return {
+                logoUrl: process.env.MIX_APP_URL + '/assets/img/logo.png'
+            }
+        }
+    }
 </script>
