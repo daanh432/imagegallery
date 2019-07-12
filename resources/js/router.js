@@ -7,6 +7,7 @@ import Login from './views/Login'
 import User from './views/users/UsersShow'
 import Users from './views/users/UsersIndex'
 import Images from './views/users/images/UsersImagesIndex'
+import Albums from './views/users/albums/UsersAlbumsIndex'
 // Routes
 const routes = [
     {
@@ -58,13 +59,12 @@ const routes = [
             auth: true
         }
     },
-// ADMIN ROUTES
     {
-        path: '/users',
-        name: 'users.index',
-        component: Users,
+        path: '/albums',
+        name: 'albums.index',
+        component: Albums,
         meta: {
-            auth: {roles: 2}
+            auth: true
         }
     },
     {
@@ -81,6 +81,23 @@ const routes = [
         component: Images,
         meta: {
             auth: true
+        }
+    },
+    {
+        path: '/users/:userId/albums',
+        name: 'users.albums.index',
+        component: Albums,
+        meta: {
+            auth: true
+        }
+    },
+// ADMIN ROUTES
+    {
+        path: '/users',
+        name: 'users.index',
+        component: Users,
+        meta: {
+            auth: {roles: 2}
         }
     }
 ];

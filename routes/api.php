@@ -14,8 +14,8 @@ Route::namespace('Api')->group(function () {
 
     // Authentication routes
     Route::prefix('/auth')->group(function () {
-        Route::post('/register', 'AuthController@register');
-        Route::post('/login', 'AuthController@login');
+        Route::post('/register', 'AuthController@register')->middleware('throttle:6,5');
+        Route::post('/login', 'AuthController@login')->middleware('throttle:6,5');
         Route::group(['middleware' => 'auth:api'], function () {
             Route::get('/user', 'AuthController@user');
             Route::get('/refresh', 'AuthController@refresh');
@@ -37,6 +37,13 @@ Route::namespace('Api')->group(function () {
         Route::post('/users/{user}/images', 'ImagesController@store');
         Route::patch('/users/{user}/images/{image}', 'ImagesController@update');
         Route::delete('/users/{user}/images/{image}', 'ImagesController@destroy');
+
+        // User album overview routes
+        Route::get('/users/{user}/albums', 'AlbumsController@index');
+        Route::post('/users/{user}/albums', 'AlbumsController@store');
+        Route::get('/users/{user}/albums/{album}', 'AlbumsController@show');
+        Route::patch('/users/{user}/albums/{album}', 'AlbumsController@update');
+        Route::delete('/users/{user}/albums/{album}', 'AlbumsController@destroy');
     });
 });
 

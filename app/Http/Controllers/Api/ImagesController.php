@@ -21,7 +21,7 @@ class ImagesController extends Controller
     public function __construct()
     {
         $this->middleware('auth:api');
-        $this->middleware('can:view,image')->only(['show', 'edit', 'update', 'destroy']);
+        $this->middleware('can:view,image')->only(['update', 'destroy']);
     }
 
     /**

@@ -3,7 +3,8 @@
         <div class="uk-container uk-background-primary uk-border-rounded uk-margin-large-top uk-padding uk-width-1-2@l">
             <div v-if="!has_error">
                 <h1 class="uk-text-center">Welcome {{ user.name }}</h1>
-
+                <router-link :to="ImageRoute">Images</router-link>
+                <router-link :to="AlbumRoute">Albums</router-link>
             </div>
             <div v-if="has_error">
                 <h1 class="uk-text-center">You're not authorized to view this users information</h1>
@@ -43,6 +44,19 @@
                     this.has_error = false;
                     this.user = data.data;
                 }
+            }
+        },
+
+        computed: {
+            ImageRoute() {
+                let originalId = this.$route.params.userId ? this.$route.params.userId + '' : this.$auth.user().id = '';
+                let userId = this.$auth.user().id + '';
+                return originalId === userId ? {name: 'images.index'} : {name: 'users.images.index', params: {userId: originalId}};
+            },
+            AlbumRoute() {
+                let originalId = this.$route.params.userId ? this.$route.params.userId + '' : this.$auth.user().id = '';
+                let userId = this.$auth.user().id + '';
+                return originalId === userId ? {name: 'albums.index'} : {name: 'users.albums.index', params: {userId: originalId}};
             }
         },
 

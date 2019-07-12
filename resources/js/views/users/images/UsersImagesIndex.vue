@@ -28,41 +28,41 @@
             </div>
         </div>
 
-        <form id="dragAndDropForm" ref="fileform" v-if="!has_error"></form>
-
-        <div class="uk-overflow-hidden" v-if="!has_error">
-            <div class="uk-container uk-background-primary uk-border-rounded uk-margin-large-top uk-padding">
-                <h1 class="uk-text-center">Images</h1>
-                <div class="uk-text-center uk-margin-bottom">
-                    <div uk-form-custom>
-                        <input multiple type="file" v-on:change="UploadDialog($event)">
-                        <button class="uk-button uk-button-small uk-button-default" tabindex="-1" type="button"><span uk-icon="icon: push"></span> Upload Images</button>
-                    </div>
-                </div>
-                <div>
-                    <div class="uk-grid-small uk-child-width-1-1 uk-child-width-1-3@m uk-child-width-1-4@l uk-child-width-1-5@xl" uk-grid uk-lightbox="animation: slide">
-                        <div class="imageContainer" v-for="(image, key) in reversedItems">
-                            <span @click="EditImage(image.id)" class="uk-icon-button uk-button-default editImageIcon" uk-icon="icon: pencil"></span>
-                            <a :data-caption="image.description != null ? image.description : ''" :href="image.url" class="imageThumbnail">
-                                <v-lazy-image :alt="image.name" :src="image.thumbUrl" class="uk-width-1-1"></v-lazy-image>
-                            </a>
+        <form id="dragAndDropForm" ref="fileform" v-if="!has_error">
+            <div class="uk-overflow-hidden">
+                <div class="uk-container uk-background-primary uk-border-rounded uk-margin-large-top uk-padding">
+                    <h1 class="uk-text-center">Images</h1>
+                    <div class="uk-text-center uk-margin-bottom">
+                        <div uk-form-custom>
+                            <input multiple type="file" v-on:change="UploadDialog($event)">
+                            <button class="uk-button uk-button-small uk-button-default" tabindex="-1" type="button"><span uk-icon="icon: push"></span> Upload Images</button>
                         </div>
                     </div>
-                    <div class="uk-text-center" uk-grid v-if="meta">
-                        <div class="uk-width-1-3@m">
-                            <button @click="goToPrev" class="uk-button uk-button-default" v-if="prevPage">Previous</button>
+                    <div>
+                        <div class="uk-grid-small uk-child-width-1-1 uk-child-width-1-3@m uk-child-width-1-4@l uk-child-width-1-5@xl" uk-grid uk-lightbox="animation: slide">
+                            <div class="imageContainer" v-for="(image, key) in reversedItems">
+                                <span @click="EditImage(image.id)" class="uk-icon-button uk-button-default editImageIcon" uk-icon="icon: pencil"></span>
+                                <a :data-caption="image.description != null ? image.description : ''" :href="image.url" class="imageThumbnail">
+                                    <v-lazy-image :alt="image.name" :src="image.thumbUrl" class="uk-width-1-1"></v-lazy-image>
+                                </a>
+                            </div>
                         </div>
-                        <div class="uk-width-1-3@m">
-                            <p v-text="paginatonCount"></p>
-                        </div>
-                        <div class="uk-width-1-3@m">
-                            <button @click="goToNext" class="uk-button uk-button-default" v-if="nextPage">Next</button>
+                        <div class="uk-text-center" uk-grid v-if="meta">
+                            <div class="uk-width-1-3@m">
+                                <button @click="goToPrev" class="uk-button uk-button-default" v-if="prevPage">Previous</button>
+                            </div>
+                            <div class="uk-width-1-3@m">
+                                <p v-text="paginatonCount"></p>
+                            </div>
+                            <div class="uk-width-1-3@m">
+                                <button @click="goToNext" class="uk-button uk-button-default" v-if="nextPage">Next</button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div v-else>
+        </form>
+        <div v-if="has_error">
             <div class="uk-container uk-background-primary uk-border-rounded uk-margin-large-top uk-padding">
                 <h1 class="uk-text-center">An error occurred during load. Please try again later.</h1>
             </div>
@@ -77,7 +77,8 @@
 
     const getImages = (params, token, callback) => {
         axios.get(`users/${params.userId}/images`, {
-            params, headers: {
+            page: params.page,
+            headers: {
                 'Authorization': `Bearer ${token}`
             }
         }).then(response => {
@@ -298,11 +299,20 @@
         },
 
         beforeRouteEnter(to, from, next) {
-            let userId = to.params.userId != null ? to.params.userId : window.VueAPP.$auth.user().id;
-            let token = window.VueAPP.$auth.token();
-            let params = {userId, page: to.query.page};
-            getImages(params, token, (err, data) => {
-                next(vm => vm.setData(err, data));
+            next(vm => {
+                vm.$auth.fetch({
+                    params: {},
+                    success: function () {
+                        let userId = to.params.userId != null ? to.params.userId : vm.$auth.user().id;
+                        let params = {userId, page: to.query.page};
+                        getImages(params, vm.$auth.token(), (err, data) => {
+                            vm.setData(err, data);
+                        });
+                    },
+                    error: function () {
+                        vm.has_error = true;
+                    },
+                });
             });
         },
 
@@ -316,7 +326,7 @@
         },
 
         mounted() {
-            this.userId = this.$route != null && this.$route.params != null && this.$route.params.userId != null ? this.$route.params.userId : window.VueAPP.$auth.user().id;
+            this.userId = this.$route != null && this.$route.params != null && this.$route.params.userId != null ? this.$route.params.userId : this.$auth.user().id;
             this.dragAndDropCapable = determineDragAndDropCapable();
             if (this.dragAndDropCapable) {
                 ['drag', 'dragstart', 'dragend', 'dragover', 'dragenter', 'dragleave', 'drop'].forEach(function (evt) {

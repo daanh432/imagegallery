@@ -11,12 +11,15 @@
                         <router-link :to="{ name: 'contact' }"><span uk-icon="icon: mail; ratio: 2"></span> Contact</router-link>
                     </li>
                     <li>
-                        <router-link :to="{ name: 'users.images.index', params: {userId: $auth.user().id}}" v-if="$auth.check()"><span uk-icon="icon: image; ratio: 2"></span> Images</router-link>
+                        <router-link :to="{ name: 'images.index' }" v-if="$auth.check()"><span uk-icon="icon: image; ratio: 2"></span> Images</router-link>
+                    </li>
+                    <li>
+                        <router-link :to="{ name: 'albums.index' }" v-if="$auth.check()"><span uk-icon="icon: thumbnails; ratio: 2"></span> Albums</router-link>
                     </li>
                     <li class="uk-nav-header">Profile</li>
                     <li class="uk-nav-divider"></li>
                     <li v-if="$auth.check()">
-                        <router-link :to="{ name: 'users.show', params: {userId: $auth.user().id} }"><span uk-icon="icon: user; ratio: 2"></span> {{ $auth.user().name }}</router-link>
+                        <router-link :to="{ name: 'dashboard.show' }"><span uk-icon="icon: user; ratio: 2"></span> {{ $auth.user().name }}</router-link>
                     </li>
                     <li v-if="$auth.check()">
                         <a @click.prevent="$auth.logout()" href=""><span uk-icon="icon: sign-out; ratio: 2"></span> Logout</a>
@@ -26,6 +29,11 @@
                     </li>
                     <li v-if="!$auth.check()">
                         <router-link :to="{ name: 'login' }">Login</router-link>
+                    </li>
+                    <li class="uk-nav-header" v-if="$auth.check(2)">Admin</li>
+                    <li class="uk-nav-divider" v-if="$auth.check(2)"></li>
+                    <li v-if="$auth.check(2)">
+                        <router-link :to="{ name: 'users.index' }">Users</router-link>
                     </li>
                 </ul>
             </div>
