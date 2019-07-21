@@ -20,7 +20,7 @@ class ImageResource extends JsonResource
             'name' => $this->name,
             'description' => $this->description,
             'url' => route('users.images.show', [$this->user_id, $this->url]),
-            'thumbUrl' => route('users.images.show', [$this->user_id, $this->url]),
+            'thumbUrl' => route('users.images.show', [$this->user_id, $this->thumbUrl]),
         ];
     }
 }
