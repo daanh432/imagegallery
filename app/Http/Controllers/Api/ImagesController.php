@@ -36,8 +36,17 @@ class ImagesController extends Controller
 //            return ImageResource::collection($user->Images()->paginate(20)); // Pages support
             return ImageResource::collection($user->Images()->get()); // Lazy load scrolling support
         } else {
-            return response()->json(['status' => 'Unauthorized', 'message' => 'You do not have permissions to view this users images.'], 403);
+            return response()->json(['status' => 'Unauthorized', 'message' => 'You do not have permissions to view this users images.'], 401);
         }
+    }
+
+    public function show(User $user, string $image)
+    {
+        $path = $this->ImagePath($user, $image, true);
+        if (file_exists($path)) {
+            return response()->file($path, ['Content-Type' => 'image/jpeg']);
+        }
+        abort(404);
     }
 
     /**
@@ -48,30 +57,45 @@ class ImagesController extends Controller
      */
     public function store(Request $request, User $user)
     {
-        $validator = Validator::make($request->all(), [
-            'newImage' => ['required', 'image', 'mimetypes:image/jpeg,image/jpg,image/png', 'max:10240']
-        ]);
-        if ($validator->fails() || !$request->file('newImage')->isValid()) {
-            return response()->json([
-                'status' => 'error',
-                'errors' => $validator->errors()
-            ], 422);
+        if (Auth::user()->IsAdmin() || Auth::user()->id === $user->id) {
+            $validator = Validator::make($request->all(), [
+                'newImage' => ['required', 'image', 'mimetypes:image/jpeg,image/jpg,image/png', 'max:10240']
+            ]);
+            if ($validator->fails() || !$request->file('newImage')->isValid()) {
+                return response()->json([
+                    'status' => 'error',
+                    'errors' => $validator->errors()
+                ], 422);
+            } else {
+                $normalImage = (string)Image::make($request->file('newImage'))->encode('jpg', 80);
+                $thumbImage = (string)Image::make($request->file('newImage'))->resize(1000, null, function ($constraint) {
+                    $constraint->aspectRatio();
+                    $constraint->upsize();
+                })->encode('jpg', 70);
+
+                // Generates unique file names for the images
+                $path = Str::random(10) . '_' . $request->file('newImage')->hashName();
+                $thumbPath = '/thumb/' . Str::random(10) . '_' . $request->file('newImage')->hashName();
+
+                $image = new Images();
+                $image->name = $request->file('newImage')->getClientOriginalName();
+                $image->description = null;
+
+                // Stores images in /storage/app/images/XX/
+                $image->url = Storage::disk('local')->put($this->ImagePath($user, $path, false), $normalImage) ? $path : null;
+                // Stores thumbs in /storage/app/images/XX/thumb/
+                $image->thumbUrl = Storage::disk('local')->put($this->ImagePath($user, $thumbPath, false), $thumbImage) ? $thumbPath : null;
+
+                // Stores which user the image belongs to
+                $image->user_id = $user->id;
+                $image->save();
+                return new ImageResource($image);
+            }
         } else {
-            $normalImage = (string)Image::make($request->file('newImage'))->encode('jpg', 80);
-            $thumbImage = (string)Image::make($request->file('newImage'))->resize(1000, null, function ($constraint) {
-                $constraint->aspectRatio();
-                $constraint->upsize();
-            })->encode('jpg', 70);
-            $path = 'images/' . $user->id . '/' . Str::random(10) . '_' . $request->file('newImage')->hashName();
-            $thumbPath = 'images/' . $user->id . '/thumb/' . Str::random(10) . '_' . $request->file('newImage')->hashName();
-            $image = new Images();
-            $image->name = $request->file('newImage')->getClientOriginalName();
-            $image->description = null;
-            $image->url = Storage::disk('public')->put($path, $normalImage) ? $path : null;
-            $image->thumbUrl = Storage::disk('public')->put($thumbPath, $thumbImage) ? $thumbPath : null;
-            $image->user_id = $user->id;
-            $image->save();
-            return new ImageResource($image);
+            return response()->json([
+                'status' => 'Unauthorized',
+                'message' => 'You are not allowed to upload images for this user'
+            ], 401);
         }
     }
 
@@ -113,12 +137,25 @@ class ImagesController extends Controller
      */
     public function destroy(User $user, Images $image)
     {
-        Storage::disk('public')->delete($image->url);
-        Storage::disk('public')->delete($image->thumbUrl);
+        Storage::disk('local')->delete($this->ImagePath($user, $image->url, false));
+        Storage::disk('local')->delete($this->ImagePath($user, $image->thumbUrl, false));
         $image->delete();
         return response()->json([
             'status' => 'success',
             'message' => 'Image successfully deleted'
         ], 200);
+    }
+
+    private function ImageDisk()
+    {
+        return 'local';
+    }
+
+    private function ImagePath(User $user, string $imageFileName, bool $absolute)
+    {
+        if ($absolute) {
+            return storage_path('app/images/' . $user->id . '/' . $imageFileName);
+        }
+        return 'images/' . $user->id . '/' . $imageFileName;
     }
 }

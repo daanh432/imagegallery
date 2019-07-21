@@ -35,6 +35,7 @@ Route::namespace('Api')->group(function () {
         // User image overview routes
         Route::get('/users/{user}/images', 'ImagesController@index');
         Route::post('/users/{user}/images', 'ImagesController@store');
+        Route::get('/users/{user}/images/{image}', 'ImagesController@show')->name('users.images.show')->where('image', '(.*)');
         Route::patch('/users/{user}/images/{image}', 'ImagesController@update');
         Route::delete('/users/{user}/images/{image}', 'ImagesController@destroy');
 

@@ -8,6 +8,7 @@ import User from './views/users/UsersShow'
 import Users from './views/users/UsersIndex'
 import Images from './views/users/images/UsersImagesIndex'
 import Albums from './views/users/albums/UsersAlbumsIndex'
+import Album from './views/users/albums/UsersAlbumsShow'
 // Routes
 const routes = [
     {
@@ -63,6 +64,14 @@ const routes = [
         path: '/albums',
         name: 'albums.index',
         component: Albums,
+        meta: {
+            auth: true
+        }
+    },
+    {
+        path: '/albums/:albumId',
+        name: 'albums.show',
+        component: Album,
         meta: {
             auth: true
         }

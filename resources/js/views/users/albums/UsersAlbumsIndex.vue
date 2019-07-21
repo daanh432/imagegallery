@@ -25,45 +25,22 @@
                         <button @click="SaveAlbum" class="uk-button uk-button-default" type="button">Save</button>
                     </p>
                 </div>
-                <!--                <div v-if="updating">-->
-                <!--                    <h2 class="uk-modal-title">Update Album Information</h2>-->
-                <!--                    <form class="uk-form-blank">-->
-                <!--                        <div class="uk-margin">-->
-                <!--                            <label class="uk-form-label" for="name">Image Name</label>-->
-                <!--                            <div class="uk-form-controls">-->
-                <!--                                <input class="uk-input" id="name" name="Name" placeholder="The name of this image" type="text" v-model="images[selectedImageId].name">-->
-                <!--                            </div>-->
-                <!--                        </div>-->
-
-                <!--                        <div class="uk-margin">-->
-                <!--                            <label class="uk-form-label" for="description">Image Description</label>-->
-                <!--                            <div class="uk-form-controls">-->
-                <!--                                <textarea class="uk-textarea" id="description" name="Description" placeholder="Description of this image" rows="10" v-model="images[selectedImageId].description"></textarea>-->
-                <!--                            </div>-->
-                <!--                        </div>-->
-                <!--                    </form>-->
-
-                <!--                    <p class="uk-text-right">-->
-                <!--                        <button @click="DeleteImage(selectedImageId)" class="uk-button uk-button-danger" type="button">Delete</button>-->
-                <!--                        <button class="uk-button uk-button-muted uk-modal-close" type="button">Cancel</button>-->
-                <!--                        <button @click="UpdateImage" class="uk-button uk-button-default" type="button">Save</button>-->
-                <!--                    </p>-->
-                <!--                </div>-->
             </div>
         </div>
 
         <div class="uk-overflow-hidden" v-if="!has_error">
             <div class="uk-container uk-background-primary uk-border-rounded uk-margin-large-top uk-padding">
                 <h1 class="uk-text-center">Albums</h1>
-                <button @click.prevent="CreateAlbum" class="uk-button uk-button-small uk-button-default" type="button"><span uk-icon="icon: push"></span> New Album</button>
+                <div class="uk-text-center uk-margin-bottom">
+                    <button @click.prevent="CreateAlbum" class="uk-button uk-button-small uk-button-default" type="button"><span uk-icon="icon: push"></span> New Album</button>
+                </div>
                 <div>
-                    <div class="uk-grid-small uk-child-width-1-1 uk-child-width-1-3@m uk-child-width-1-4@l uk-child-width-1-5@xl" uk-grid uk-lightbox="animation: slide">
-                        <div class="albumContainer" v-for="(album, key) in reversedItems">
-                            {{ album.name }}
-                            <!--                            <span @click="EditAlbum(image.id)" class="uk-icon-button uk-button-default editImageIcon" uk-icon="icon: pencil"></span>-->
-                            <!--                            <a :data-caption="image.description != null ? image.description : ''" :href="image.url" class="imageThumbnail">-->
-                            <!--                                <v-lazy-image :alt="image.name" :src="image.thumbUrl" class="uk-width-1-1"></v-lazy-image>-->
-                            <!--                            </a>-->
+                    <div class="uk-grid-small uk-child-width-1-1 uk-child-width-1-2@m uk-child-width-1-3@l uk-child-width-1-4@xl" uk-grid>
+                        <div :key="album.id" class="albumContainer" v-for="(album, key) in reversedItems">
+                            <span @click="EditAlbum(album.id)" class="uk-icon-button uk-button-default editImageIcon" uk-icon="icon: pencil"></span>
+                            <router-link :to="{ name: 'albums.show', params: {albumId: album.id}}" class="imageThumbnail">
+                                <v-lazy-image :alt="'Random Image From' + album.randomImage.name" :src="album.randomImage.thumbUrl" class="uk-width-1-1"></v-lazy-image>
+                            </router-link>
                         </div>
                     </div>
                     <div class="uk-text-center" uk-grid v-if="meta">
@@ -161,9 +138,32 @@
             },
             SaveAlbum() {
                 if (this.creating) {
-                    //
+                    let app = this;
+                    axios.post(`users/${this.userId}/albums`, {
+                        name: this.form.name,
+                        description: this.form.description,
+                        headers: {}
+                    }).then(response => {
+
+                    }).catch(response => {
+                        window.UIkit.notification({
+                            message: 'Something went wrong when trying to create this album. Please try again later or contact us.',
+                            status: 'danger',
+                            pos: 'bottom-center',
+                            timeout: 5000
+                        });
+                    });
                 } else if (this.updating) {
-                    //
+                    axios.post('').then(response => {
+
+                    }).catch(response => {
+                        window.UIkit.notification({
+                            message: 'Something went wrong when trying to update this album. Please try again later or contact us.',
+                            status: 'danger',
+                            pos: 'bottom-center',
+                            timeout: 5000
+                        });
+                    });
                 }
             },
             goToNext() {
@@ -191,7 +191,7 @@
                     });
                 } else {
                     this.has_error = false;
-                    this.images = data.data;
+                    this.albums = data.data;
                     this.meta = data.meta;
                 }
             }

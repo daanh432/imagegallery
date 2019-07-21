@@ -4,7 +4,6 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Facades\Storage;
 
 class ImageResource extends JsonResource
 {
@@ -20,8 +19,8 @@ class ImageResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'description' => $this->description,
-            'url' => Storage::disk('public')->url($this->url),
-            'thumbUrl' => Storage::disk('public')->url($this->thumbUrl),
+            'url' => route('users.images.show', [$this->user_id, $this->url]),
+            'thumbUrl' => route('users.images.show', [$this->user_id, $this->url]),
         ];
     }
 }

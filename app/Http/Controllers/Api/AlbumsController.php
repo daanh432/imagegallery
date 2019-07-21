@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class AlbumsController extends Controller
 {
@@ -29,8 +30,8 @@ class AlbumsController extends Controller
     public function index(User $user)
     {
         if (Auth::user() && (Auth::user()->IsAdmin() || Auth::user()->id === $user->id)) {
-//            return AlbumResource::collection($user->Albums()->paginate(20)); // Pages support
-            return AlbumResource::collection($user->Albums()->get()); // Lazy load scrolling support
+            return AlbumResource::collection($user->Albums()->paginate(20)); // Pages support
+//            return AlbumResource::collection($user->Albums()->get()); // Lazy load scrolling support
         }
     }
 
@@ -38,11 +39,32 @@ class AlbumsController extends Controller
      * Store a newly created resource in storage.
      *
      * @param Request $request
-     * @return Response
+     * @param User $user
+     * @return AlbumResource|Response
      */
     public function store(Request $request, User $user)
     {
-        //
+        if (Auth::user()->IsAdmin() || Auth::user()->id === $user->id) {
+            $validator = Validator::make($request->all(), [
+                'name' => ['required', 'max:250'],
+                'description' => ['required', 'max: 2048'],
+            ]);
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => 'error',
+                    'errors' => $validator->errors()
+                ], 421);
+            } else {
+                $album = new Albums();
+                $album->name = $request->get('name');
+                $album->description = $request->get('description');
+                $album->user_id = $user->id;
+                $album->save();
+                return new AlbumResource($album);
+            }
+        } else {
+            return response()->json(['status' => 'Unauthorized', 'message' => 'You are not authorized to create albums for this user'], 401);
+        }
     }
 
     /**
