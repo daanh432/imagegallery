@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Albums;
+use App\Album;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\AlbumResource;
 use App\User;
@@ -55,7 +55,7 @@ class AlbumsController extends Controller
                     'errors' => $validator->errors()
                 ], 421);
             } else {
-                $album = new Albums();
+                $album = new Album();
                 $album->name = $request->get('name');
                 $album->description = $request->get('description');
                 $album->user_id = $user->id;
@@ -70,22 +70,22 @@ class AlbumsController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param Albums $albums
-     * @return Response
+     * @param Album $albums
+     * @return AlbumResource|Response
      */
-    public function show(User $user, Albums $album)
+    public function show(User $user, Album $album)
     {
-        //
+        return new AlbumResource($album);
     }
 
     /**
      * Update the specified resource in storage.
      *
      * @param Request $request
-     * @param Albums $albums
+     * @param Album $albums
      * @return Response
      */
-    public function update(Request $request, User $user, Albums $album)
+    public function update(Request $request, User $user, Album $album)
     {
         //
     }
@@ -93,10 +93,10 @@ class AlbumsController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param Albums $albums
+     * @param Album $albums
      * @return Response
      */
-    public function destroy(User $user, Albums $album)
+    public function destroy(User $user, Album $album)
     {
         //
     }

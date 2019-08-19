@@ -36,22 +36,24 @@
                 </div>
                 <div>
                     <div class="uk-grid-small uk-child-width-1-1 uk-child-width-1-2@m uk-child-width-1-3@l uk-child-width-1-4@xl" uk-grid>
-                        <div :key="album.id" class="albumContainer" v-for="(album, key) in reversedItems">
+                        <div :key="album.id" class="imageContainer" v-for="(album, key) in reversedItems">
                             <span @click="EditAlbum(album.id)" class="uk-icon-button uk-button-default editImageIcon" uk-icon="icon: pencil"></span>
                             <router-link :to="{ name: 'albums.show', params: {albumId: album.id}}" class="imageThumbnail">
-                                <v-lazy-image :alt="'Random Image From' + album.randomImage.name" :src="album.randomImage.thumbUrl" class="uk-width-1-1"></v-lazy-image>
+                                <lazy-component :key="'lazy-' + album.id" @show="ShowImage($event, album.randomImage.thumbUrl)">
+                                    <img :alt="'Random Image From' + album.randomImage.name" :key="'img-' + album.id" class="uk-width-1-1">
+                                </lazy-component>
                             </router-link>
                         </div>
                     </div>
                     <div class="uk-text-center" uk-grid v-if="meta">
                         <div class="uk-width-1-3@m">
-                            <button @click="goToPrev" class="uk-button uk-button-default" v-if="prevPage">Previous</button>
+                            <button @click="GoToPrev" class="uk-button uk-button-default" v-if="prevPage">Previous</button>
                         </div>
                         <div class="uk-width-1-3@m">
                             <p v-text="paginatonCount"></p>
                         </div>
                         <div class="uk-width-1-3@m">
-                            <button @click="goToNext" class="uk-button uk-button-default" v-if="nextPage">Next</button>
+                            <button @click="GoToNext" class="uk-button uk-button-default" v-if="nextPage">Next</button>
                         </div>
                     </div>
                 </div>
@@ -65,7 +67,7 @@
     </div>
 </template>
 <script>
-    const getAlbums = (params, token, callback) => {
+    const GetAlbums = (params, token, callback) => {
         axios.get(`users/${params.userId}/albums`, {
             page: params.page,
             headers: {
@@ -166,21 +168,21 @@
                     });
                 }
             },
-            goToNext() {
+            GoToNext() {
                 this.$router.push({
                     query: {
                         page: this.nextPage,
                     },
                 });
             },
-            goToPrev() {
+            GoToPrev() {
                 this.$router.push({
                     query: {
                         page: this.prevPage,
                     }
                 });
             },
-            setData(err, data) {
+            SetData(err, data) {
                 if (err) {
                     this.has_error = true;
                     window.UIkit.notification({
@@ -194,7 +196,30 @@
                     this.albums = data.data;
                     this.meta = data.meta;
                 }
-            }
+            },
+            ShowImage(event, url) {
+                let app = this;
+                if (url.startsWith('https://')) {
+                    this.$nextTick(() => {
+                        let image = event.$el.querySelector('img');
+                        image.src = url;
+                    });
+                } else {
+                    this.$nextTick(() => {
+                        let image = event.$el.querySelector('img');
+                        axios.get(url, {
+                            responseType: 'arraybuffer',
+                            headers: {
+                                Authorization: `Bearer ${app.$auth.token()}`
+                            }
+                        }).then(response => {
+                            image.src = 'data:image/jpeg;base64,' + new Buffer.from(response.data, 'binary').toString('base64');
+                        }).catch(response => {
+                            image.src = 'http://imagegallery.test/assets/img/placeholder.jpg';
+                        });
+                    });
+                }
+            },
         },
 
         beforeRouteEnter(to, from, next) {
@@ -204,8 +229,8 @@
                     success: function () {
                         let userId = to.params.userId != null ? to.params.userId : vm.$auth.user().id;
                         let params = {userId, page: to.query.page};
-                        getAlbums(params, vm.$auth.token(), (err, data) => {
-                            vm.setData(err, data);
+                        GetAlbums(params, vm.$auth.token(), (err, data) => {
+                            vm.SetData(err, data);
                         });
                     },
                     error: function () {
@@ -218,8 +243,8 @@
         beforeRouteUpdate(to, from, next) {
             let userId = to.params.userId != null ? to.params.userId : this.$auth.user().id;
             let params = {userId, page: to.query.page};
-            getAlbums(params, this.$auth.token(), (err, data) => {
-                this.setData(err, data);
+            GetAlbums(params, this.$auth.token(), (err, data) => {
+                this.SetData(err, data);
                 next();
             });
         },

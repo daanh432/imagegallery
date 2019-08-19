@@ -2,11 +2,11 @@
 
 /* @var $factory Factory */
 
-use App\Images;
+use App\Image;
 use Faker\Generator as Faker;
 use Illuminate\Database\Eloquent\Factory;
 
-$factory->define(Images::class, function (Faker $faker) {
+$factory->define(Image::class, function (Faker $faker) {
     $path = storage_path('app/public/images/1/');
     if (!file_exists($path)) {
         mkdir($path, 0777, true);

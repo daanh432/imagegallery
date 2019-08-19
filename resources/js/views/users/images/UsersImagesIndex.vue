@@ -129,7 +129,7 @@
                 // Upload instantly
                 this.UploadImage();
             },
-            setData(err, data) {
+            SetData(err, data) {
                 if (err) {
                     this.has_error = true;
                     window.UIkit.notification({
@@ -154,7 +154,7 @@
                         let userId = to.params.userId != null ? to.params.userId : vm.$auth.user().id;
                         let params = {userId, page: to.query.page};
                         getImages(params, vm.$auth.token(), (err, data) => {
-                            vm.setData(err, data);
+                            vm.SetData(err, data);
                         });
                     },
                     error: function () {
@@ -168,7 +168,7 @@
             let userId = to.params.userId != null ? to.params.userId : this.$auth.user().id;
             let params = {userId, page: to.query.page};
             getImages(params, this.$auth.token(), (err, data) => {
-                this.setData(err, data);
+                this.SetData(err, data);
                 next();
             });
         },

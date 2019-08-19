@@ -100,6 +100,14 @@ const routes = [
             auth: true
         }
     },
+    {
+        path: '/users/:userId/albums/:albumId',
+        name: 'users.albums.show',
+        component: Album,
+        meta: {
+            auth: true
+        }
+    },
 // ADMIN ROUTES
     {
         path: '/users',

@@ -2,11 +2,11 @@
 
 namespace App\Policies;
 
-use App\Albums;
+use App\Album;
 use App\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
-class AlbumsPolicy
+class AlbumPolicy
 {
     use HandlesAuthorization;
 
@@ -25,10 +25,10 @@ class AlbumsPolicy
      * Determine whether the user can view the albums.
      *
      * @param User $user
-     * @param Albums $albums
+     * @param Album $albums
      * @return mixed
      */
-    public function view(User $user, Albums $album)
+    public function view(User $user, Album $album)
     {
         return $user->IsAdmin() || $user->id === $album->user_id;
     }
@@ -48,10 +48,10 @@ class AlbumsPolicy
      * Determine whether the user can update the albums.
      *
      * @param User $user
-     * @param Albums $albums
+     * @param Album $albums
      * @return mixed
      */
-    public function update(User $user, Albums $album)
+    public function update(User $user, Album $album)
     {
         return $user->IsAdmin() || $user->id === $album->user_id;
     }
@@ -60,10 +60,10 @@ class AlbumsPolicy
      * Determine whether the user can delete the albums.
      *
      * @param User $user
-     * @param Albums $albums
+     * @param Album $albums
      * @return mixed
      */
-    public function delete(User $user, Albums $albums)
+    public function delete(User $user, Album $albums)
     {
         //
     }
@@ -72,10 +72,10 @@ class AlbumsPolicy
      * Determine whether the user can restore the albums.
      *
      * @param User $user
-     * @param Albums $albums
+     * @param Album $albums
      * @return mixed
      */
-    public function restore(User $user, Albums $albums)
+    public function restore(User $user, Album $albums)
     {
         //
     }
@@ -84,10 +84,10 @@ class AlbumsPolicy
      * Determine whether the user can permanently delete the albums.
      *
      * @param User $user
-     * @param Albums $albums
+     * @param Album $albums
      * @return mixed
      */
-    public function forceDelete(User $user, Albums $albums)
+    public function forceDelete(User $user, Album $albums)
     {
         //
     }

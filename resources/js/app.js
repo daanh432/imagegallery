@@ -15,8 +15,18 @@ Vue.router = router;
 Vue.use(VueRouter);
 Vue.use(VeeValidate);
 Vue.use(VueLazyload, {
-    lazyComponent: true
+    preLoad: 1.3,
+    attempt: 1,
+    lazyComponent: true,
 });
+
+// Temporary fix for the VueLazyLoad plugin missing the .destroy function
+Vue.use({
+    install() {
+        Vue.prototype.destroy = Vue.prototype.$destroy;
+    },
+});
+
 // Set Vue authentication
 Vue.use(VueAxios, axios);
 axios.defaults.baseURL = `${process.env.MIX_APP_URL}/api`;

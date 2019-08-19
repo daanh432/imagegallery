@@ -34,7 +34,7 @@
         },
 
         methods: {
-            setData(err, data) {
+            SetData(err, data) {
                 if (err) {
                     this.has_error = true;
                     this.$router.push({
@@ -69,7 +69,7 @@
             }
             let token = window.localStorage.getItem('ImageGallery-Auth-Token');
             getUser(userId, token, (err, data) => {
-                next(vm => vm.setData(err, data));
+                next(vm => vm.SetData(err, data));
             });
         },
 
@@ -81,7 +81,7 @@
                 userId = this.$auth.user().id;
             }
             getUser(userId, this.$auth.token(), (err, data) => {
-                this.setData(err, data);
+                this.SetData(err, data);
                 next();
             });
         },

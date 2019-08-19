@@ -24,7 +24,7 @@ class UserController extends Controller
         if (Auth::user()->IsAdmin() || Auth::user()->id === $user->id) {
             return new UserResource($user);
         } else {
-            return response()->json(['status' => 'error', 'message' => 'You\'re not authorized to view this user\'s information.'], 403);
+            return response()->json(['status' => 'error', 'message' => 'You\'re not authorized to view this user\'s information.'], 401);
         }
     }
 }

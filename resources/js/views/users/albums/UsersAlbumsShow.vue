@@ -31,6 +31,19 @@
 
     import Images from '../../../components/Images';
 
+    const getAlbum = (params, token, callback) => {
+        axios.get(`users/${params.userId}/albums/${params.albumId}`, {
+            page: params.page,
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        }).then(response => {
+            callback(null, response.data);
+        }).catch(error => {
+            callback(error, error.response.data);
+        });
+    };
+
     export default {
         components: {
             Images: Images
@@ -72,6 +85,7 @@
                 const file = this.files[0];
                 let formData = new FormData();
                 formData.append('newImage', file);
+                formData.append('albumId', this.album.id);
                 this.files.splice(0, 1);
                 if (file.type === 'image/png' || file.type === 'image/jpeg' || file.type === 'image/jpg') {
                     this.runningUploads = this.runningUploads + 1;
@@ -90,7 +104,7 @@
                                 timeout: 2500
                             });
                         }
-                        app.images.push(response.data.data);
+                        app.album.images.push(response.data.data);
                         app.runningUploads = app.runningUploads - 1;
                     }).catch(response => {
                         if (app.files.length === 0) {
@@ -121,6 +135,20 @@
                 // Upload instantly
                 this.UploadImage();
             },
+            SetData(err, data) {
+                if (err) {
+                    this.has_error = true;
+                    window.UIkit.notification({
+                        message: 'Something went wrong when trying to fetch data. Please try again later or contact us.',
+                        status: 'danger',
+                        pos: 'bottom-center',
+                        timeout: 5000
+                    });
+                } else {
+                    this.has_error = false;
+                    this.album = data.data;
+                }
+            }
         },
 
         mounted() {
@@ -142,6 +170,33 @@
                     this.UploadImage();
                 }.bind(this));
             }
+        },
+
+        beforeRouteEnter(to, from, next) {
+            next(vm => {
+                vm.$auth.fetch({
+                    params: {},
+                    success: function () {
+                        let userId = to.params.userId != null ? to.params.userId : vm.$auth.user().id;
+                        let params = {userId, page: to.query.page, albumId: to.params.albumId};
+                        getAlbum(params, vm.$auth.token(), (err, data) => {
+                            vm.SetData(err, data);
+                        });
+                    },
+                    error: function () {
+                        vm.has_error = true;
+                    },
+                });
+            });
+        },
+
+        beforeRouteUpdate(to, from, next) {
+            let userId = to.params.userId != null ? to.params.userId : this.$auth.user().id;
+            let params = {userId, page: to.query.page, albumId: to.params.albumId};
+            getAlbum(params, this.$auth.token(), (err, data) => {
+                this.SetData(err, data);
+                next();
+            });
         },
     }
 </script>

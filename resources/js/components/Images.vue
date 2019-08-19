@@ -28,11 +28,11 @@
             </div>
         </div>
         <div class="uk-grid-small uk-child-width-1-1 uk-child-width-1-3@m uk-child-width-1-4@l uk-child-width-1-5@xl" uk-grid uk-lightbox="animation: slide">
-            <div class="imageContainer" v-for="(image, key) in images">
+            <div :key="'imgContainer-' + image.id" class="imageContainer" v-for="(image, key) in images">
                 <span @click="EditImage(image.id)" class="uk-icon-button uk-button-default editImageIcon" uk-icon="icon: pencil"></span>
-                <lazy-component @show="ShowImage($event, image.thumbUrl)">
-                    <a :data-caption="image.description != null ? image.description : ''" :href="image.url + '?token=' + $auth.token()" class="imageThumbnail">
-                        <img :alt="image.name" :src="''" class="uk-width-1-1">
+                <lazy-component :key="'lazy-' + image.id" @show="ShowImage($event, image.thumbUrl)">
+                    <a :data-caption="image.description != null ? image.description : ''" :href="image.url + '?token=' + $auth.token()" :key="'a-' + image.id" class="imageThumbnail">
+                        <img :alt="image.name" :key="'img-' + image.id" :src="''" class="uk-width-1-1">
                     </a>
                 </lazy-component>
             </div>
@@ -75,9 +75,8 @@
         methods: {
             ShowImage(event, url) {
                 let app = this;
-                setTimeout(() => {
+                this.$nextTick(() => {
                     let image = event.$el.querySelector('img');
-                    console.log(url);
                     axios.get(url, {
                         responseType: 'arraybuffer',
                         headers: {
@@ -88,7 +87,7 @@
                     }).catch(response => {
                         image.src = 'http://imagegallery.test/assets/img/placeholder.jpg';
                     });
-                }, 5);
+                });
             },
             ResetEditForm() {
                 this.updated === false ? this.images[this.selectedImageId] = this.selectedImageBackup : null;
@@ -163,14 +162,14 @@
                     });
                 }
             },
-            goToNext() {
+            GoToNext() {
                 this.$router.push({
                     query: {
                         page: this.nextPage,
                     },
                 });
             },
-            goToPrev() {
+            GoToPrev() {
                 this.$router.push({
                     query: {
                         page: this.prevPage,

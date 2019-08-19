@@ -4,10 +4,10 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Albums extends Model
+class Album extends Model
 {
     public function Images()
     {
-        return $this->hasMany('App\AlbumImages', 'album_id', 'id');
+        return $this->belongsToMany('App\Image');
     }
 }

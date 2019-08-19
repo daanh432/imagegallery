@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ImageResource;
-use App\Images;
+use App\Image;
 use App\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
-use Intervention\Image\Facades\Image;
+use Intervention\Image\Facades\Image as InterventionImage;
 
 class ImagesController extends Controller
 {
@@ -40,9 +40,11 @@ class ImagesController extends Controller
         }
     }
 
-    public function show(User $user, string $image)
+    public function show(User $user, String $imagePath)
     {
-        $path = $this->ImagePath($user, $image, true);
+        $image = Image::where('url', '=', $imagePath)->orWhere('thumbUrl', '=', $imagePath)->get()->first();
+        abort_if(Auth::user() == null || Auth::user()->cant('view', $image), 401);
+        $path = $this->ImagePath($user, $imagePath, true);
         if (file_exists($path)) {
             return response()->file($path, ['Content-Type' => 'image/jpeg']);
         }
@@ -59,7 +61,8 @@ class ImagesController extends Controller
     {
         if (Auth::user()->IsAdmin() || Auth::user()->id === $user->id) {
             $validator = Validator::make($request->all(), [
-                'newImage' => ['required', 'image', 'mimetypes:image/jpeg,image/jpg,image/png', 'max:10240']
+                'newImage' => ['required', 'image', 'mimetypes:image/jpeg,image/jpg,image/png', 'max:10240'],
+                'albumId' => ['nullable', 'integer']
             ]);
             if ($validator->fails() || !$request->file('newImage')->isValid()) {
                 return response()->json([
@@ -67,8 +70,8 @@ class ImagesController extends Controller
                     'errors' => $validator->errors()
                 ], 422);
             } else {
-                $normalImage = (string)Image::make($request->file('newImage'))->encode('jpg', 80);
-                $thumbImage = (string)Image::make($request->file('newImage'))->resize(1000, null, function ($constraint) {
+                $normalImage = (string)InterventionImage::make($request->file('newImage'))->encode('jpg', 80);
+                $thumbImage = (string)InterventionImage::make($request->file('newImage'))->resize(1000, null, function ($constraint) {
                     $constraint->aspectRatio();
                     $constraint->upsize();
                 })->encode('jpg', 70);
@@ -77,7 +80,9 @@ class ImagesController extends Controller
                 $path = Str::random(10) . '_' . $request->file('newImage')->hashName();
                 $thumbPath = '/thumb/' . Str::random(10) . '_' . $request->file('newImage')->hashName();
 
-                $image = new Images();
+                $albumId = $request->get('albumId', null);
+
+                $image = new Image();
                 $image->name = $request->file('newImage')->getClientOriginalName();
                 $image->description = null;
 
@@ -89,6 +94,7 @@ class ImagesController extends Controller
                 // Stores which user the image belongs to
                 $image->user_id = $user->id;
                 $image->save();
+                $albumId != null ? $image->Albums()->sync($albumId) : null;
                 return new ImageResource($image);
             }
         } else {
@@ -103,10 +109,10 @@ class ImagesController extends Controller
      * Update the specified resource in storage.
      *
      * @param Request $request
-     * @param Images $images
+     * @param Image $images
      * @return Response
      */
-    public function update(Request $request, User $user, Images $image)
+    public function update(Request $request, User $user, Image $image)
     {
         $validator = Validator::make($request->all(), [
             'name' => 'nullable',
@@ -132,10 +138,10 @@ class ImagesController extends Controller
      * Remove the specified resource from storage.
      *
      * @param User $user
-     * @param Images $image
+     * @param Image $image
      * @return Response
      */
-    public function destroy(User $user, Images $image)
+    public function destroy(User $user, Image $image)
     {
         Storage::disk('local')->delete($this->ImagePath($user, $image->url, false));
         Storage::disk('local')->delete($this->ImagePath($user, $image->thumbUrl, false));

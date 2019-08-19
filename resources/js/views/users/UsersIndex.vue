@@ -66,21 +66,21 @@
                     }
                 });
             },
-            goToNext() {
+            GoToNext() {
                 this.$router.push({
                     query: {
                         page: this.nextPage,
                     },
                 });
             },
-            goToPrev() {
+            GoToPrev() {
                 this.$router.push({
                     query: {
                         page: this.prevPage,
                     }
                 });
             },
-            setData(err, data) {
+            SetData(err, data) {
                 if (err) {
                     this.has_error = true;
                     window.UIkit.notification({
@@ -127,13 +127,13 @@
             };
             let token = window.localStorage.getItem('ImageGallery-Auth-Token');
             getUsers(to.query.page, token, (err, data) => {
-                next(vm => vm.setData(err, data));
+                next(vm => vm.SetData(err, data));
             });
         },
 
         beforeRouteUpdate(to, from, next) {
             getUsers(to.query.page, this.$auth.token(), (err, data) => {
-                this.setData(err, data);
+                this.SetData(err, data);
                 next();
             });
         },
