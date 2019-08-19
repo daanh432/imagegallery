@@ -41,6 +41,7 @@
                             <router-link :to="{ name: 'albums.show', params: {albumId: album.id}}" class="imageThumbnail">
                                 <lazy-component :key="'lazy-' + album.id" @show="ShowImage($event, album.randomImage.thumbUrl)">
                                     <img :alt="'Random Image From' + album.randomImage.name" :key="'img-' + album.id" class="uk-width-1-1">
+                                    <p class="uk-text-center uk-margin-remove-top">{{ album.name }}</p>
                                 </lazy-component>
                             </router-link>
                         </div>
@@ -125,18 +126,18 @@
 
         methods: {
             EditAlbum(key) {
-
-            },
-            CreateAlbum() {
                 let albumId = this.albums.findIndex(obj => {
                     return obj.id === key;
                 });
+            },
+            CreateAlbum() {
                 window.UIkit.modal(this.$refs.AlbumModal).show();
                 this.creating = true;
             },
             ResetForm() {
-                this.name = null;
-                this.description = null;
+                this.form.name = null;
+                this.form.description = null;
+                this.creating = false;
             },
             SaveAlbum() {
                 if (this.creating) {
@@ -146,7 +147,8 @@
                         description: this.form.description,
                         headers: {}
                     }).then(response => {
-
+                        this.albums.push(response.data.data);
+                        window.UIkit.modal(this.$refs.ImageEditModal).hide();
                     }).catch(response => {
                         window.UIkit.notification({
                             message: 'Something went wrong when trying to create this album. Please try again later or contact us.',

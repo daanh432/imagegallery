@@ -69,7 +69,8 @@ body, html {
     min-height: 100px;
 }
 
-.imageContainer:hover > .editImageIcon {
+.imageContainer:hover > .editImageIcon,
+.imageContainer:hover > .selectImageIcon {
     opacity: 1;
     -webkit-transition: opacity 1s;
     -moz-transition: opacity 1s;
@@ -83,11 +84,18 @@ body, html {
 }
 
 .selectImageIcon {
+    opacity: 0;
+    -webkit-transition: opacity 2s;
+    -moz-transition: opacity 2s;
+    -ms-transition: opacity 2s;
+    -o-transition: opacity 2s;
+    transition: opacity 2s;
     position: absolute;
-    top: 2px;
-    left: 12px;
+    top: 8px;
+    left: 18px;
     z-index: 100;
     cursor: pointer;
+    background: darken(white, 10%);
 }
 
 .editImageIcon {
