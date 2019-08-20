@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Image extends Model
 {
-    protected $fillable = ['name', 'description', 'user_id', 'url', 'thumbUrl'];
+    protected $fillable = ['name', 'description', 'user_id', 'url', 'thumbUrl', 'date'];
 
     /**
      * @return Album[]|Collection

@@ -1,5 +1,10 @@
 <template>
     <div>
+        <ul :style="{top: menu.top, left: menu.left}" @blur="CloseMenu" id="right-click-menu" ref="rightClickMenu" tabindex="-1" v-if="menu.view">
+            <li @click.stop="" v-if="inAlbum">Remove Photo From Album</li>
+            <li @click.stop="EditImage(menu.id)">Edit Photo</li>
+            <li @click.stop="">Delete Photo</li>
+        </ul>
         <div ref="ImageEditModal" uk-modal v-on:hidden="ResetEditForm">
             <div class="uk-modal-dialog uk-modal-body" v-if="selectedImageId != null">
                 <h2 class="uk-modal-title">Update Image Information</h2>
@@ -28,9 +33,9 @@
             </div>
         </div>
         <div class="uk-grid-small uk-child-width-1-1 uk-child-width-1-3@m uk-child-width-1-4@l uk-child-width-1-5@xl" uk-grid uk-lightbox="animation: slide">
-            <div :key="'imgContainer-' + image.id" class="imageContainer" v-for="(image, key) in images">
-                <input class="uk-checkbox selectImageIcon" type="checkbox">
-                <span @click="EditImage(image.id)" class="uk-icon-button uk-button-default editImageIcon" uk-icon="icon: pencil"></span>
+            <div :key="'imgContainer-' + image.id" @click.right="OpenMenu($event, image.id)" class="imageContainer" v-for="(image, key) in images">
+                <input :checked="currentSelectedImages.includes(image.id)" @click="SelectImage($event, image.id)" class="uk-checkbox selectImageIcon" type="checkbox" v-if="selectBoxes">
+                <span @click="EditImage(image.id)" class="uk-icon-button uk-button-default editImageIcon" uk-icon="icon: pencil" v-if="!selectBoxes"></span>
                 <lazy-component :key="'lazy-' + image.id" @show="ShowImage($event, image.thumbUrl)">
                     <a :data-caption="image.description != null ? image.description : ''" :href="image.url + '?token=' + $auth.token()" :key="'a-' + image.id" class="imageThumbnail">
                         <img :alt="image.name" :key="'img-' + image.id" :src="''" class="uk-width-1-1">
@@ -62,19 +67,66 @@
             },
             meta: {
                 type: Object
+            },
+            inAlbum: {
+                type: Boolean
+            },
+            enableSelection: {
+                type: Boolean
+            },
+            currentSelectedImages: {
+                type: Array
             }
         },
 
         data() {
             return {
+                menu: {
+                    top: 0,
+                    left: 0,
+                    id: null,
+                    view: false,
+                    loading: false,
+                },
                 updated: false,
                 selectedImageId: null,
                 selectedImageBackup: null,
-                selectBoxes: false,
+                selectBoxes: this.enableSelection != null ? this.enableSelection : false,
+                selectedImages: this.currentSelectedImages != null ? this.currentSelectedImages : [],
             }
         },
 
         methods: {
+            SetMenu(top, left) {
+                top = window.scrollY + top - 25;
+                let largestWidth = window.innerWidth - this.$refs.rightClickMenu.offsetWidth - 25;
+                if (left > largestWidth) left = largestWidth;
+                this.menu.top = top + 'px';
+                this.menu.left = left + 'px';
+            },
+            OpenMenu(e, id) {
+                if (this.menu.loading === false) {
+                    this.menu.view = true;
+                    this.menu.id = id;
+                    this.menu.top = window.scrollY + 10 + 'px';
+                    this.$nextTick(() => {
+                        this.$refs.rightClickMenu.focus();
+                        this.SetMenu(e.y, e.x)
+                    });
+                    e.preventDefault();
+                }
+            },
+            CloseMenu() {
+                this.menu.view = false;
+            },
+            SelectImage(event, imageId) {
+                if (event.target.checked) {
+                    this.selectedImages.push(imageId);
+                } else {
+                    this.selectedImages.splice(this.selectedImages.findIndex(value => value === imageId), 1);
+                }
+                this.$emit('selectionChange', this.selectedImages);
+            },
             ShowImage(event, url) {
                 let app = this;
                 this.$nextTick(() => {
@@ -97,6 +149,7 @@
                 this.selectedImageBackup = null;
             },
             EditImage(key) {
+                this.menu.view = false;
                 this.selectedImageId = this.images.findIndex(obj => {
                     return obj.id === key;
                 });
@@ -205,3 +258,33 @@
         }
     }
 </script>
+
+<style scoped>
+    #right-click-menu {
+        background: #FAFAFA;
+        border: 1px solid #BDBDBD;
+        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, .14), 0 3px 1px -2px rgba(0, 0, 0, .2), 0 1px 5px 0 rgba(0, 0, 0, .12);
+        display: block;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        position: absolute;
+        width: 275px;
+        z-index: 999999;
+    }
+
+    #right-click-menu li {
+        border-bottom: 1px solid #E0E0E0;
+        margin: 0;
+        padding: 5px 35px;
+    }
+
+    #right-click-menu li:last-child {
+        border-bottom: none;
+    }
+
+    #right-click-menu li:hover {
+        background: #1E88E5;
+        color: #FAFAFA;
+    }
+</style>

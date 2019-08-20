@@ -68,18 +68,7 @@
     </div>
 </template>
 <script>
-    const GetAlbums = (params, token, callback) => {
-        axios.get(`users/${params.userId}/albums`, {
-            page: params.page,
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        }).then(response => {
-            callback(null, response.data);
-        }).catch(error => {
-            callback(error, error.response.data);
-        });
-    };
+    import AlbumApi from '../../../api/albums';
 
     export default {
         data() {
@@ -231,7 +220,7 @@
                     success: function () {
                         let userId = to.params.userId != null ? to.params.userId : vm.$auth.user().id;
                         let params = {userId, page: to.query.page};
-                        GetAlbums(params, vm.$auth.token(), (err, data) => {
+                        AlbumApi.GetAlbums(params, vm.$auth.token(), (err, data) => {
                             vm.SetData(err, data);
                         });
                     },
@@ -245,14 +234,14 @@
         beforeRouteUpdate(to, from, next) {
             let userId = to.params.userId != null ? to.params.userId : this.$auth.user().id;
             let params = {userId, page: to.query.page};
-            GetAlbums(params, this.$auth.token(), (err, data) => {
+            AlbumApi.GetAlbums(params, this.$auth.token(), (err, data) => {
                 this.SetData(err, data);
                 next();
             });
         },
 
         mounted() {
-            this.userId = this.$route != null && this.$route.params != null && this.$route.params.userId != null ? this.$route.params.userId : window.VueAPP.$auth.user().id;
+            this.userId = this.$route != null && this.$route.params != null && this.$route.params.userId != null ? this.$route.params.userId : this.$auth.user().id;
         },
     }
 </script>

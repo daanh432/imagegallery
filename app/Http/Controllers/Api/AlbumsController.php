@@ -83,11 +83,32 @@ class AlbumsController extends Controller
      *
      * @param Request $request
      * @param Album $albums
-     * @return Response
+     * @return AlbumResource|Response
      */
     public function update(Request $request, User $user, Album $album)
     {
-        //
+        if (Auth::user()->IsAdmin() || Auth::user()->id === $user->id) {
+            $validator = Validator::make($request->all(), [
+                'name' => ['required', 'max:250'],
+                'description' => ['required', 'max: 2048'],
+                'images' => ['nullable'],
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => 'error',
+                    'errors' => $validator->errors()
+                ], 421);
+            } else {
+                $album->name = $request->get('name');
+                $album->description = $request->get('description');
+                $album->Images()->sync($request->get('images'));
+                $album->save();
+                return new AlbumResource($album);
+            }
+        } else {
+            return response()->json(['status' => 'Unauthorized', 'message' => 'You are not authorized to update albums for this user'], 401);
+        }
     }
 
     /**

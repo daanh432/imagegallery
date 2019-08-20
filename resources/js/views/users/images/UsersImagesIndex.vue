@@ -11,7 +11,7 @@
                         </div>
                     </div>
                     <div>
-                        <Images :images="this.reversedItems" :meta="meta" :userId="userId"></Images>
+                        <Images :images="sortedImages" :meta="meta" :userId="userId"></Images>
                     </div>
                 </div>
             </div>
@@ -29,19 +29,7 @@
         return (('draggable' in div) || ('ondragstart' in div && 'ondrop' in div)) && 'FormData' in window && 'FileReader' in window;
     };
 
-    const getImages = (params, token, callback) => {
-        axios.get(`users/${params.userId}/images`, {
-            page: params.page,
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        }).then(response => {
-            callback(null, response.data);
-        }).catch(error => {
-            callback(error, error.response.data);
-        });
-    };
-
+    import ImageApi from '../../../api/images';
     import Images from '../../../components/Images';
 
     export default {
@@ -62,8 +50,14 @@
         },
 
         computed: {
-            reversedItems() {
-                return this.images.slice().reverse();
+            sortedImages() {
+                return this.images.sort((a, b) => {
+                    if (a.timestamp < b.timestamp)
+                        return 1;
+                    if (a.timestamp > b.timestamp)
+                        return -1;
+                    return 0;
+                });
             }
         },
 
@@ -79,6 +73,8 @@
             UploadImage() {
                 const file = this.files[0];
                 let formData = new FormData();
+                console.log(file.lastModifiedDate);
+                formData.append('date', file.lastModified);
                 formData.append('newImage', file);
                 this.files.splice(0, 1);
                 if (file.type === 'image/png' || file.type === 'image/jpeg' || file.type === 'image/jpg') {
@@ -153,7 +149,7 @@
                     success: function () {
                         let userId = to.params.userId != null ? to.params.userId : vm.$auth.user().id;
                         let params = {userId, page: to.query.page};
-                        getImages(params, vm.$auth.token(), (err, data) => {
+                        ImageApi.GetImages(params, vm.$auth.token(), (err, data) => {
                             vm.SetData(err, data);
                         });
                     },
@@ -167,7 +163,7 @@
         beforeRouteUpdate(to, from, next) {
             let userId = to.params.userId != null ? to.params.userId : this.$auth.user().id;
             let params = {userId, page: to.query.page};
-            getImages(params, this.$auth.token(), (err, data) => {
+            ImageApi.GetImages(params, this.$auth.token(), (err, data) => {
                 this.SetData(err, data);
                 next();
             });

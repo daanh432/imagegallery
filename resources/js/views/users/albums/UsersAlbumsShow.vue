@@ -1,17 +1,34 @@
 <template>
     <div>
+        <div class="uk-modal-container" ref="AddImageModal" uk-modal="bg-close: false; esc-close: false;" v-if="album != null && album.images != null">
+            <div class="uk-modal-dialog">
+                <div class="uk-modal-header uk-text-center">
+                    <h1>Add Images to {{ this.AlbumName }}</h1>
+                </div>
+                <div class="uk-modal-body" uk-overflow-auto>
+                    <Images :currentSelectedImages="album.images.map(a => a.id)" :enable-selection="true" :images="availableImages" :meta="null" :userId="userId" @selectionChange="selectedImages = $event"></Images>
+                </div>
+                <div class="uk-modal-footer">
+                    <p class="uk-text-right">
+                        <button class="uk-button uk-button-muted uk-modal-close" type="button">Cancel</button>
+                        <button @click="AddImagesSave" class="uk-button uk-button-default" type="button">Save</button>
+                    </p>
+                </div>
+            </div>
+        </div>
         <form id="dragAndDropForm" ref="fileform" v-if="!has_error">
             <div class="uk-overflow-hidden">
                 <div class="uk-container uk-background-primary uk-border-rounded uk-margin-large-top uk-padding">
                     <h1 class="uk-text-center">Images from the album {{ this.AlbumName }}</h1>
                     <div class="uk-text-center uk-margin-bottom">
+                        <button @click="AddImages" class="uk-button uk-button-small uk-button-default" tabindex="-1" type="button"><span uk-icon="icon: plus-circle"></span> Add Images</button>
                         <div uk-form-custom>
                             <input multiple type="file" v-on:change="UploadDialog($event)">
                             <button class="uk-button uk-button-small uk-button-default" tabindex="-1" type="button"><span uk-icon="icon: push"></span> Upload Images</button>
                         </div>
                     </div>
                     <div>
-                        <Images :images="this.reversedItems" :meta="null" :userId="userId"></Images>
+                        <Images :enable-selection="false" :images="this.sortedImages" :in-album="true" :meta="null" :userId="userId"></Images>
                     </div>
                 </div>
             </div>
@@ -30,19 +47,8 @@
     };
 
     import Images from '../../../components/Images';
-
-    const getAlbum = (params, token, callback) => {
-        axios.get(`users/${params.userId}/albums/${params.albumId}`, {
-            page: params.page,
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        }).then(response => {
-            callback(null, response.data);
-        }).catch(error => {
-            callback(error, error.response.data);
-        });
-    };
+    import AlbumApi from '../../../api/albums';
+    import ImageApi from '../../../api/images';
 
     export default {
         components: {
@@ -56,13 +62,21 @@
                 album: null,
                 dragAndDropCapable: false,
                 files: [],
-                runningUploads: 0
+                runningUploads: 0,
+                selectedImages: [],
+                availableImages: null,
             }
         },
 
         computed: {
-            reversedItems() {
-                return this.album != null && Object.entries(this.album).length !== 0 && this.album.constructor === Object && this.album.images != null && this.album.images.constructor === Array ? this.album.images.slice().reverse() : [];
+            sortedImages() {
+                return this.images.sort((a, b) => {
+                    if (a.timestamp < b.timestamp)
+                        return 1;
+                    if (a.timestamp > b.timestamp)
+                        return -1;
+                    return 0;
+                });
             },
             /**
              * @return {string}
@@ -81,11 +95,49 @@
         },
 
         methods: {
+            AddImages() {
+                let params = {userId: this.userId, page: this.$route.query.page};
+                ImageApi.GetImages(params, this.$auth.token(), (err, data) => {
+                    if (err) {
+                        this.has_error = true;
+                        window.UIkit.notification({
+                            message: 'Something went wrong when trying to fetch data. Please try again later or contact us.',
+                            status: 'danger',
+                            pos: 'bottom-center',
+                            timeout: 5000
+                        });
+                    } else {
+                        this.has_error = false;
+                        this.availableImages = data.data.sort((a, b) => {
+                            if (a.timestamp < b.timestamp)
+                                return 1;
+                            if (a.timestamp > b.timestamp)
+                                return -1;
+                            return 0;
+                        });
+                    }
+                });
+                window.UIkit.modal(this.$refs.AddImageModal).show();
+            },
+            AddImagesSave() {
+                axios.post(`users/${this.userId}/albums/${this.album.id}`, {
+                    '_method': 'PATCH',
+                    name: this.album.name,
+                    description: this.album.description,
+                    images: this.selectedImages,
+                }).then(response => {
+                    this.SetData(null, response.data);
+                    window.UIkit.modal(this.$refs.AddImageModal).hide();
+                }).catch(error => {
+                    this.SetData(error, error.response.data);
+                });
+            },
             UploadImage() {
                 const file = this.files[0];
                 let formData = new FormData();
                 formData.append('newImage', file);
                 formData.append('albumId', this.album.id);
+                formData.append('date', file.lastModified);
                 this.files.splice(0, 1);
                 if (file.type === 'image/png' || file.type === 'image/jpeg' || file.type === 'image/jpg') {
                     this.runningUploads = this.runningUploads + 1;
@@ -179,7 +231,7 @@
                     success: function () {
                         let userId = to.params.userId != null ? to.params.userId : vm.$auth.user().id;
                         let params = {userId, page: to.query.page, albumId: to.params.albumId};
-                        getAlbum(params, vm.$auth.token(), (err, data) => {
+                        AlbumApi.GetAlbum(params, vm.$auth.token(), (err, data) => {
                             vm.SetData(err, data);
                         });
                     },
@@ -193,7 +245,7 @@
         beforeRouteUpdate(to, from, next) {
             let userId = to.params.userId != null ? to.params.userId : this.$auth.user().id;
             let params = {userId, page: to.query.page, albumId: to.params.albumId};
-            getAlbum(params, this.$auth.token(), (err, data) => {
+            AlbumApi.GetAlbum(params, this.$auth.token(), (err, data) => {
                 this.SetData(err, data);
                 next();
             });

@@ -34,7 +34,7 @@ axios.defaults.headers.common['Content-Type'] = `application/json`;
 Vue.use(VueAuth, auth);
 // Load Index
 Vue.component('app', App);
-window.VueAPP = new Vue({
+const app = new Vue({
     el: '#app',
     router
 });

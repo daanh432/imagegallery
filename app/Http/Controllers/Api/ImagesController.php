@@ -10,6 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -62,7 +63,8 @@ class ImagesController extends Controller
         if (Auth::user()->IsAdmin() || Auth::user()->id === $user->id) {
             $validator = Validator::make($request->all(), [
                 'newImage' => ['required', 'image', 'mimetypes:image/jpeg,image/jpg,image/png', 'max:10240'],
-                'albumId' => ['nullable', 'integer']
+                'albumId' => ['nullable', 'integer', 'exists:albums'],
+                'date' => ['required']
             ]);
             if ($validator->fails() || !$request->file('newImage')->isValid()) {
                 return response()->json([
@@ -85,6 +87,7 @@ class ImagesController extends Controller
                 $image = new Image();
                 $image->name = $request->file('newImage')->getClientOriginalName();
                 $image->description = null;
+                $image->date = Carbon::createFromTimestamp($request->get('date') / 1000)->toDateTimeString();
 
                 // Stores images in /storage/app/images/XX/
                 $image->url = Storage::disk('local')->put($this->ImagePath($user, $path, false), $normalImage) ? $path : null;
