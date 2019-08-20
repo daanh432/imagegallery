@@ -98,6 +98,15 @@ body, html {
     background: darken(white, 10%);
 }
 
+.selectImageIcon:checked {
+    opacity: 1;
+    -webkit-transition: opacity 2s;
+    -moz-transition: opacity 2s;
+    -ms-transition: opacity 2s;
+    -o-transition: opacity 2s;
+    transition: opacity 2s;
+}
+
 .editImageIcon {
     opacity: 0;
     -webkit-transition: opacity 2s;

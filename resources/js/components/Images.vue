@@ -29,6 +29,7 @@
         </div>
         <div class="uk-grid-small uk-child-width-1-1 uk-child-width-1-3@m uk-child-width-1-4@l uk-child-width-1-5@xl" uk-grid uk-lightbox="animation: slide">
             <div :key="'imgContainer-' + image.id" class="imageContainer" v-for="(image, key) in images">
+                <input class="uk-checkbox selectImageIcon" type="checkbox">
                 <span @click="EditImage(image.id)" class="uk-icon-button uk-button-default editImageIcon" uk-icon="icon: pencil"></span>
                 <lazy-component :key="'lazy-' + image.id" @show="ShowImage($event, image.thumbUrl)">
                     <a :data-caption="image.description != null ? image.description : ''" :href="image.url + '?token=' + $auth.token()" :key="'a-' + image.id" class="imageThumbnail">
@@ -69,6 +70,7 @@
                 updated: false,
                 selectedImageId: null,
                 selectedImageBackup: null,
+                selectBoxes: false,
             }
         },
 
