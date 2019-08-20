@@ -51,13 +51,13 @@
 
         computed: {
             sortedImages() {
-                return this.images.sort((a, b) => {
+                return this.images != null && this.images.length > 0 ? this.images.sort((a, b) => {
                     if (a.timestamp < b.timestamp)
                         return 1;
                     if (a.timestamp > b.timestamp)
                         return -1;
                     return 0;
-                });
+                }) : [];
             }
         },
 

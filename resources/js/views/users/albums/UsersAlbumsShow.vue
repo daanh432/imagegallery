@@ -70,13 +70,13 @@
 
         computed: {
             sortedImages() {
-                return this.images.sort((a, b) => {
+                return this.album != null && this.album.images != null && this.album.images.length > 0 ? this.album.images.sort((a, b) => {
                     if (a.timestamp < b.timestamp)
                         return 1;
                     if (a.timestamp > b.timestamp)
                         return -1;
                     return 0;
-                });
+                }) : [];
             },
             /**
              * @return {string}
