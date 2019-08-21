@@ -137,7 +137,7 @@
                         headers: {}
                     }).then(response => {
                         this.albums.push(response.data.data);
-                        window.UIkit.modal(this.$refs.ImageEditModal).hide();
+                        window.UIkit.modal(this.$refs.AlbumModal).hide();
                     }).catch(response => {
                         window.UIkit.notification({
                             message: 'Something went wrong when trying to create this album. Please try again later or contact us.',
