@@ -63,7 +63,7 @@ class ImagesController extends Controller
         if (Auth::user()->IsAdmin() || Auth::user()->id === $user->id) {
             $validator = Validator::make($request->all(), [
                 'newImage' => ['required', 'image', 'mimetypes:image/jpeg,image/jpg,image/png', 'max:10240'],
-                'albumId' => ['nullable', 'integer', 'exists:albums'],
+                'albumId' => ['nullable', 'integer', 'exists:albums,id'],
                 'date' => ['required']
             ]);
             if ($validator->fails() || !$request->file('newImage')->isValid()) {
