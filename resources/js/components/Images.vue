@@ -3,7 +3,7 @@
         <ul :style="{top: menu.top, left: menu.left}" @blur="CloseMenu" id="right-click-menu" ref="rightClickMenu" tabindex="-1" v-if="menu.view">
             <li @click.stop="" v-if="inAlbum">Remove Photo From Album</li>
             <li @click.stop="EditImage(menu.id)">Edit Photo</li>
-            <li @click.stop="">Delete Photo</li>
+            <li @click.stop="DeleteImage(menu.id)">Delete Photo</li>
         </ul>
         <div ref="ImageEditModal" uk-modal v-on:hidden="ResetEditForm">
             <div class="uk-modal-dialog uk-modal-body" v-if="selectedImageId != null">
@@ -33,7 +33,7 @@
             </div>
         </div>
         <div class="uk-grid-small uk-child-width-1-1 uk-child-width-1-3@m uk-child-width-1-4@l uk-child-width-1-5@xl" uk-grid uk-lightbox="animation: slide">
-            <div :key="'imgContainer-' + image.id" @click.right="OpenMenu($event, image.id)" class="imageContainer" v-for="(image, key) in images">
+            <div :Test="keyPrefix + '-imgContainer-' + image.id" @click.right="OpenMenu($event, image.id)" class="imageContainer" v-for="(image, key) in images">
                 <input :checked="currentSelectedImages.includes(image.id)" @click="SelectImage($event, image.id)" class="uk-checkbox selectImageIcon" type="checkbox" v-if="selectBoxes">
                 <span @click="EditImage(image.id)" class="uk-icon-button uk-button-default editImageIcon" uk-icon="icon: pencil" v-if="!selectBoxes"></span>
                 <lazy-component :key="'lazy-' + image.id" @show="ShowImage($event, image.thumbUrl)">
@@ -76,6 +76,9 @@
             },
             currentSelectedImages: {
                 type: Array
+            },
+            inputKeyPrefix: {
+                type: String
             }
         },
 
@@ -187,10 +190,12 @@
                     });
                 }
             },
-            DeleteImage(key) {
-                if (this.selectedImageId != null) {
+            DeleteImage(imageId) {
+                if (imageId != null) {
+                    let key = this.images.findIndex(image => image.id === imageId);
                     let app = this;
-                    window.UIkit.modal.confirm(`Are you sure you want to delete the image ${this.images[key].name}`).then(function () {
+                    this.menu.view = false;
+                    window.UIkit.modal.confirm(`Are you sure you want to delete the image ${this.images[key].name} permanently? This deletes the image entirely! Not just from an album.`).then(function () {
                         axios.post(`users/${app.userId}/images/${app.images[key].id}`, {
                             '_method': 'DELETE',
                             'Authorization': app.$auth.token()
@@ -217,6 +222,9 @@
                     });
                 }
             },
+            RemoveFromAlbum(imageId) {
+                this.$emit('remove-image-from-album', imageId);
+            },
             GoToNext() {
                 this.$router.push({
                     query: {
@@ -234,6 +242,9 @@
         },
 
         computed: {
+            keyPrefix() {
+                return this.inputKeyPrefix != null ? this.inputKeyPrefix : 'AKukSUdtyn678DCtofsah4HNJf';
+            },
             nextPage() {
                 if (!this.meta || this.meta.current_page >= this.meta.last_page) {
                     return;
