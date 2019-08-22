@@ -119,6 +119,11 @@ class AlbumsController extends Controller
      */
     public function destroy(User $user, Album $album)
     {
-        //
+        if (Auth::user()->IsAdmin() || Auth::user()->id === $user->id) {
+            $album->delete();
+            return response()->json(['status' => 'success', 'message' => 'Album successfully deleted'], 200);
+        } else {
+            return response()->json(['status' => 'Unauthorized', 'message' => 'You are not authorized to update albums for this user'], 401);
+        }
     }
 }
