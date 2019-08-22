@@ -6,7 +6,7 @@
                     <h1>Add Images to {{ this.AlbumName }}</h1>
                 </div>
                 <div class="uk-modal-body" uk-overflow-auto>
-                    <Images :currentSelectedImages="album.images.map(a => a.id)" :enable-selection="true" :images="availableImages" :meta="null" :userId="userId" @selectionChange="selectedImages = $event"></Images>
+                    <Images :currentSelectedImages="album.images.map(a => a.id)" :enable-selection="true" :images="availableImages" :meta="null" :userId="userId" @selectionChange="selectedImages = $event" input-key-prefix="laksE2sJNKUtsdfl3ujusiFCJStoakaBo28iSDAGH83746Yib42matrijGBUuY7"></Images>
                 </div>
                 <div class="uk-modal-footer">
                     <p class="uk-text-right">
@@ -28,7 +28,7 @@
                         </div>
                     </div>
                     <div>
-                        <Images :enable-selection="false" :images="this.sortedImages" :in-album="true" :meta="null" :userId="userId" input-key-prefix="laksE2smatrijGJNKUtsdfl3utoa46YiBo28iSDAGH837b42kajusiFCJSBUuY7"></Images>
+                        <Images :enable-selection="false" :images="this.sortedImages" :in-album="true" :meta="null" :userId="userId" input-key-prefix="laksE2smatrijGJNKUtsdfl3utoa46YiBo28iSDAGH837b42kajusiFCJSBUuY7" v-on:removeImageFromAlbum="RemoveImageFromAlbum($event)"></Images>
                     </div>
                 </div>
             </div>
@@ -131,6 +131,17 @@
                 }).catch(error => {
                     this.SetData(error, error.response.data);
                 });
+            },
+            RemoveImageFromAlbum(event) {
+                console.log(event);
+                if (this.album != null && this.album.images != null && event != null) {
+                    let key = this.album.images.findIndex(image => image.id === event);
+                    if (key !== -1) {
+                        this.album.images.splice(key, 1);
+                        this.selectedImages = this.album.images.map(image => image.id);
+                        this.AddImagesSave();
+                    }
+                }
             },
             UploadImage() {
                 const file = this.files[0];

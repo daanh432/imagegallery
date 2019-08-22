@@ -1,7 +1,7 @@
 <template>
     <div>
         <ul :style="{top: menu.top, left: menu.left}" @blur="CloseMenu" id="right-click-menu" ref="rightClickMenu" tabindex="-1" v-if="menu.view">
-            <li @click.stop="" v-if="inAlbum">Remove Photo From Album</li>
+            <li @click.stop="RemoveFromAlbum(menu.id)" v-if="inAlbum != null">Remove Photo From Album</li>
             <li @click.stop="EditImage(menu.id)">Edit Photo</li>
             <li @click.stop="DeleteImage(menu.id)">Delete Photo</li>
         </ul>
@@ -33,12 +33,13 @@
             </div>
         </div>
         <div class="uk-grid-small uk-child-width-1-1 uk-child-width-1-3@m uk-child-width-1-4@l uk-child-width-1-5@xl" uk-grid uk-lightbox="animation: slide">
-            <div :Test="keyPrefix + '-imgContainer-' + image.id" @click.right="OpenMenu($event, image.id)" class="imageContainer" v-for="(image, key) in images">
+            <div :key="keyPrefix + '-imgContainer-' + image.id" @click.right="OpenMenu($event, image.id)" class="imageContainer" v-for="(image, key) in images">
                 <input :checked="currentSelectedImages.includes(image.id)" @click="SelectImage($event, image.id)" class="uk-checkbox selectImageIcon" type="checkbox" v-if="selectBoxes">
                 <span @click="EditImage(image.id)" class="uk-icon-button uk-button-default editImageIcon" uk-icon="icon: pencil" v-if="!selectBoxes"></span>
-                <lazy-component :key="'lazy-' + image.id" @show="ShowImage($event, image.thumbUrl)">
-                    <a :data-caption="image.description != null ? image.description : ''" :href="image.url + '?token=' + $auth.token()" :key="'a-' + image.id" class="imageThumbnail">
-                        <img :alt="image.name" :key="'img-' + image.id" :src="''" class="uk-width-1-1">
+                <lazy-component :key="keyPrefix + '-lazy-' + image.id">
+                    <!-- @show="ShowImage($event, image.thumbUrl)" -->
+                    <a :data-caption="image.description != null ? image.description : ''" :href="image.url + '?token=' + $auth.token()" :key="keyPrefix + '-a-' + image.id" class="imageThumbnail">
+                        <img :alt="image.name" :key="keyPrefix + '-img-' + image.id" :src="AddTokenToUrl(image.thumbUrl)" class="uk-width-1-1">
                     </a>
                 </lazy-component>
             </div>
@@ -130,21 +131,11 @@
                 }
                 this.$emit('selectionChange', this.selectedImages);
             },
-            ShowImage(event, url) {
-                let app = this;
-                this.$nextTick(() => {
-                    let image = event.$el.querySelector('img');
-                    axios.get(url, {
-                        responseType: 'arraybuffer',
-                        headers: {
-                            Authorization: `Bearer ${app.$auth.token()}`
-                        }
-                    }).then(response => {
-                        image.src = 'data:image/jpeg;base64,' + new Buffer.from(response.data, 'binary').toString('base64');
-                    }).catch(response => {
-                        image.src = 'http://imagegallery.test/assets/img/placeholder.jpg';
-                    });
-                });
+            /**
+             * @return {string}
+             */
+            AddTokenToUrl(url) {
+                return `${url}?token=${this.$auth.token()}`;
             },
             ResetEditForm() {
                 this.updated === false ? this.images[this.selectedImageId] = this.selectedImageBackup : null;
@@ -223,7 +214,9 @@
                 }
             },
             RemoveFromAlbum(imageId) {
-                this.$emit('remove-image-from-album', imageId);
+                console.log(`Preparing to delete ${imageId} from album`);
+                this.$emit('removeImageFromAlbum', imageId);
+                this.menu.view = false;
             },
             GoToNext() {
                 this.$router.push({
@@ -243,7 +236,7 @@
 
         computed: {
             keyPrefix() {
-                return this.inputKeyPrefix != null ? this.inputKeyPrefix : 'AKukSUdtyn678DCtofsah4HNJf';
+                return this.inputKeyPrefix != null ? this.inputKeyPrefix : 'AKuUyfsDCt78tDsah4HNofS8Jyn67ofUdtdah4H8n67toCDCtf';
             },
             nextPage() {
                 if (!this.meta || this.meta.current_page >= this.meta.last_page) {
