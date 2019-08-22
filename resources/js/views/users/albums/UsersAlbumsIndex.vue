@@ -21,6 +21,7 @@
                     </form>
 
                     <p class="uk-text-right">
+                        <button v-if="updating === true && form.id != null" @click="DeleteAlbum(form.id)" class="uk-button uk-button-danger" type="button">Delete</button>
                         <button class="uk-button uk-button-muted uk-modal-close" type="button">Cancel</button>
                         <button @click="SaveAlbum" class="uk-button uk-button-default" type="button">Save</button>
                     </p>
@@ -83,6 +84,7 @@
                 meta: null,
                 updating: false,
                 creating: false,
+                selectedAlbum: null,
             }
         },
 
@@ -114,19 +116,45 @@
         },
 
         methods: {
-            EditAlbum(key) {
-                let albumId = this.albums.findIndex(obj => {
-                    return obj.id === key;
+            DeleteAlbum(albumId) {
+                let app = this;
+                let key = this.albums.findIndex(album => album.id === albumId);
+                window.UIkit.modal.confirm(`Are you sure you want to delete ${this.albums[key].name} permanently? This deletes the album permanently! This will not delete the images`).then(function () {
+                    axios.post(`users/${app.userId}/albums/${albumId}`, {
+                        '_method': 'DELETE',
+                        headers: {}
+                    }).then(response => {
+                        app.albums.splice(key, 1);
+                        window.UIkit.modal(app.$refs.AlbumModal).hide();
+                    }).catch(response => {
+                        window.UIkit.notification({
+                            message: 'Something went wrong when trying to create this album. Please try again later or contact us.',
+                            status: 'danger',
+                            pos: 'bottom-center',
+                            timeout: 5000
+                        });
+                    });
+                }, function () {
+                    // Do something or nothing if rejected
                 });
+
+            },
+            EditAlbum(albumId) {
+                this.form = Object.assign({}, this.albums.find(album => album.id === albumId));
+                window.UIkit.modal(this.$refs.AlbumModal).show();
+                this.updating = true;
             },
             CreateAlbum() {
                 window.UIkit.modal(this.$refs.AlbumModal).show();
                 this.creating = true;
-            },
-            ResetForm() {
                 this.form.name = null;
                 this.form.description = null;
+            },
+            ResetForm() {
+                this.form.name = '';
+                this.form.description = '';
                 this.creating = false;
+                this.updating = false;
             },
             SaveAlbum() {
                 if (this.creating) {
