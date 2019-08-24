@@ -6,6 +6,8 @@ use App\Album;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\AlbumResource;
 use App\User;
+use Illuminate\Contracts\Auth\Guard;
+use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
@@ -16,8 +18,7 @@ class AlbumsController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:api');
-        $this->middleware('can:view,album')->only('show');
+        $this->middleware('auth:api')->except(['show']);
         $this->middleware('can:update,album')->only(['edit', 'update', 'destroy']);
     }
 
@@ -48,6 +49,8 @@ class AlbumsController extends Controller
             $validator = Validator::make($request->all(), [
                 'name' => ['required', 'max:250'],
                 'description' => ['required', 'max: 2048'],
+                'access_level' => ['required'],
+                'access_password' => ['nullable'],
             ]);
             if ($validator->fails()) {
                 return response()->json([
@@ -58,6 +61,8 @@ class AlbumsController extends Controller
                 $album = new Album();
                 $album->name = $request->get('name');
                 $album->description = $request->get('description');
+                $album->access_level = $request->get('access_level');
+                $album->access_password = $request->get('access_password', null);
                 $album->user_id = $user->id;
                 $album->save();
                 return new AlbumResource($album);
@@ -75,7 +80,11 @@ class AlbumsController extends Controller
      */
     public function show(User $user, Album $album)
     {
-        return new AlbumResource($album);
+        if (($this->Guard()->check() && $this->Guard()->user() != null && $this->Guard()->user()->can('view', $album)) || $album->access_level === 2) {
+            return response()->json(['data' => new AlbumResource($album), 'authorized' => $this->Guard()->user() != null ? $this->Guard()->user()->can('update', $album) : false]);
+        } else {
+            return response()->json(['status' => 'Unauthorized', 'Authenticate' => false], 403);
+        }
     }
 
     /**
@@ -92,6 +101,8 @@ class AlbumsController extends Controller
                 'name' => ['required', 'max:250'],
                 'description' => ['required', 'max: 2048'],
                 'images' => ['nullable'],
+                'access_level' => ['required'],
+                'access_password' => ['nullable'],
             ]);
 
             if ($validator->fails()) {
@@ -102,6 +113,8 @@ class AlbumsController extends Controller
             } else {
                 $album->name = $request->get('name');
                 $album->description = $request->get('description');
+                $album->access_level = $request->get('access_level');
+                $album->access_password = $request->get('access_password', $album->access_password);
                 $request->get('images', null) != null ? $album->Images()->sync($request->get('images', null)) : null;
                 $album->save();
                 return new AlbumResource($album);
@@ -125,5 +138,13 @@ class AlbumsController extends Controller
         } else {
             return response()->json(['status' => 'Unauthorized', 'message' => 'You are not authorized to update albums for this user'], 401);
         }
+    }
+
+    /** Returns the authentication guard to use for VueJS frontend
+     * @return Guard|StatefulGuard|mixed
+     */
+    private function Guard()
+    {
+        return Auth::guard('api');
     }
 }

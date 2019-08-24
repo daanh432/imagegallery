@@ -47,7 +47,7 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $credentials = $request->only('email', 'password');
-        if ($token = $this->guard()->attempt($credentials)) {
+        if ($token = $this->Guard()->attempt($credentials)) {
             return response()->json(['status' => 'success'], 200)->header('Authorization', $token);
         }
         return response()->json(['error' => 'login_error'], 401);
@@ -58,7 +58,7 @@ class AuthController extends Controller
      */
     public function logout()
     {
-        $this->guard()->logout();
+        $this->Guard()->logout();
         return response()->json([
             'status' => 'success',
             'message' => 'Logged out Successfully.'
@@ -97,7 +97,7 @@ class AuthController extends Controller
      */
     public function refresh()
     {
-        if ($token = $this->guard()->refresh()) {
+        if ($token = $this->Guard()->refresh()) {
             return response()
                 ->json(['status' => 'successs'], 200)
                 ->header('Authorization', $token);
@@ -108,7 +108,7 @@ class AuthController extends Controller
     /**
      * @return Guard|StatefulGuard|mixed
      */
-    private function guard()
+    private function Guard()
     {
         return Auth::guard('api');
     }

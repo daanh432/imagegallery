@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Album;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ImageResource;
 use App\Image;
 use App\User;
+use Illuminate\Contracts\Auth\Guard;
+use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -16,12 +19,13 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Intervention\Image\Facades\Image as InterventionImage;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class ImagesController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:api');
+        $this->middleware('auth:api')->except(['show']);
         $this->middleware('can:view,image')->only(['update', 'destroy']);
     }
 
@@ -41,14 +45,19 @@ class ImagesController extends Controller
         }
     }
 
-    public function show(User $user, String $imagePath)
+    public function show(Request $request, User $user, String $imagePath)
     {
         $image = Image::where('url', '=', $imagePath)->orWhere('thumbUrl', '=', $imagePath)->get()->first();
-        abort_if(Auth::user() == null || Auth::user()->cant('view', $image), 401);
-        $path = $this->ImagePath($user, $imagePath, true);
-        if (file_exists($path)) {
-            return response()->file($path, ['Content-Type' => 'image/jpeg']);
+        if ($this->Guard()->check() && $this->Guard()->user() != null) {
+            abort_if($this->Guard()->user() == null || $this->Guard()->user()->cant('view', $image), 403);
+            return $this->ReturnImage($user, $imagePath);
+        } else if ($request->get('albumId', null) != null || $request->get('access_password', null) != null && $image != null) {
+            $album = Album::find($request->get('albumId', null));
+            if ($album != null && $album->access_level === 2) {
+                return $this->ReturnImage($user, $imagePath);
+            }
         }
+
         abort(404);
     }
 
@@ -155,16 +164,40 @@ class ImagesController extends Controller
         ], 200);
     }
 
-    private function ImageDisk()
-    {
-        return 'local';
-    }
-
+    /**
+     * @param User $user
+     * @param string $imageFileName
+     * @param bool $absolute
+     * @return string
+     */
     private function ImagePath(User $user, string $imageFileName, bool $absolute)
     {
         if ($absolute) {
             return storage_path('app/images/' . $user->id . '/' . $imageFileName);
         }
         return 'images/' . $user->id . '/' . $imageFileName;
+    }
+
+    /**
+     * @param User $user
+     * @param String $imagePath
+     * @return BinaryFileResponse
+     */
+    private function ReturnImage(User $user, String $imagePath)
+    {
+        $path = $this->ImagePath($user, $imagePath, true);
+        if (file_exists($path)) {
+            return response()->file($path, ['Content-Type' => 'image/jpeg']);
+        } else {
+            abort(404, 'File not found');
+        }
+    }
+
+    /** Returns the authentication guard to use for VueJS frontend
+     * @return Guard|StatefulGuard|mixed
+     */
+    private function Guard()
+    {
+        return Auth::guard('api');
     }
 }

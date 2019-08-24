@@ -17,10 +17,10 @@
             </div>
         </div>
         <form id="dragAndDropForm" ref="fileform" v-if="!has_error">
-            <div class="uk-overflow-hidden">
+            <div class="uk-overflow-hidden" v-if="album != null && album.id != null">
                 <div class="uk-container uk-background-primary uk-border-rounded uk-margin-large-top uk-padding">
                     <h1 class="uk-text-center">Images from the album {{ this.AlbumName }}</h1>
-                    <div class="uk-text-center uk-margin-bottom">
+                    <div class="uk-text-center uk-margin-bottom" v-if="authorized">
                         <button @click="AddImages" class="uk-button uk-button-small uk-button-default" tabindex="-1" type="button"><span uk-icon="icon: plus-circle"></span> Add Images</button>
                         <div uk-form-custom>
                             <input multiple type="file" v-on:change="UploadDialog($event)">
@@ -28,7 +28,7 @@
                         </div>
                     </div>
                     <div>
-                        <Images :enable-selection="false" :images="this.sortedImages" :in-album="true" :meta="null" :userId="userId" input-key-prefix="laksE2smatrijGJNKUtsdfl3utoa46YiBo28iSDAGH837b42kajusiFCJSBUuY7" v-on:removeImageFromAlbum="RemoveImageFromAlbum($event)"></Images>
+                        <Images :enable-selection="false" :images="this.sortedImages" :in-album="album.id" :input-authorized="authorized" :meta="null" :userId="userId" input-key-prefix="laksE2smatrijGJNKUtsdfl3utoa46YiBo28iSDAGH837b42kajusiFCJSBUuY7" v-on:removeImageFromAlbum="RemoveImageFromAlbum($event)"></Images>
                     </div>
                 </div>
             </div>
@@ -58,6 +58,7 @@
         data() {
             return {
                 userId: null,
+                authorized: false,
                 has_error: false,
                 album: null,
                 dragAndDropCapable: false,
@@ -108,6 +109,7 @@
                         });
                     } else {
                         this.has_error = false;
+                        this.authorized = data.authorized;
                         this.availableImages = data.data.sort((a, b) => {
                             if (a.timestamp < b.timestamp)
                                 return 1;
@@ -209,29 +211,9 @@
                     });
                 } else {
                     this.has_error = false;
+                    this.authorized = data.authorized;
                     this.album = data.data;
                 }
-            }
-        },
-
-        mounted() {
-            this.userId = this.$route != null && this.$route.params != null && this.$route.params.userId != null ? this.$route.params.userId : this.$auth.user().id;
-            this.dragAndDropCapable = determineDragAndDropCapable();
-            if (this.dragAndDropCapable) {
-                ['drag', 'dragstart', 'dragend', 'dragover', 'dragenter', 'dragleave', 'drop'].forEach(function (evt) {
-                    this.$refs.fileform.addEventListener(evt, function (e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                    }.bind(this), false);
-                }.bind(this));
-
-                this.$refs.fileform.addEventListener('drop', function (e) {
-                    for (let i = 0; i < e.dataTransfer.files.length; i++) {
-                        this.files.push(e.dataTransfer.files[i]);
-                    }
-                    // Upload instantly
-                    this.UploadImage();
-                }.bind(this));
             }
         },
 
@@ -259,6 +241,29 @@
             AlbumApi.GetAlbum(params, this.$auth.token(), (err, data) => {
                 this.SetData(err, data);
                 next();
+            });
+        },
+
+        mounted() {
+            this.userId = this.$route != null && this.$route.params != null && this.$route.params.userId != null ? this.$route.params.userId : this.$auth.user().id;
+            this.dragAndDropCapable = determineDragAndDropCapable();
+            this.$nextTick(() => {
+                if (this.dragAndDropCapable) {
+                    ['drag', 'dragstart', 'dragend', 'dragover', 'dragenter', 'dragleave', 'drop'].forEach(function (evt) {
+                        this.$refs.fileform.addEventListener(evt, function (e) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                        }.bind(this), false);
+                    }.bind(this));
+
+                    this.$refs.fileform.addEventListener('drop', function (e) {
+                        for (let i = 0; i < e.dataTransfer.files.length; i++) {
+                            this.files.push(e.dataTransfer.files[i]);
+                        }
+                        // Upload instantly
+                        this.UploadImage();
+                    }.bind(this));
+                }
             });
         },
     }

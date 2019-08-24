@@ -68,9 +68,7 @@
             meta: {
                 type: Object
             },
-            inAlbum: {
-                type: Boolean
-            },
+            inAlbum: {},
             enableSelection: {
                 type: Boolean
             },
@@ -79,11 +77,15 @@
             },
             inputKeyPrefix: {
                 type: String
+            },
+            inputAuthorized: {
+                type: Boolean
             }
         },
 
         data() {
             return {
+                authorized: this.inputAuthorized != null ? this.inputAuthorized : false,
                 menu: {
                     top: 0,
                     left: 0,
@@ -134,7 +136,9 @@
              * @return {string}
              */
             AddTokenToUrl(url) {
-                return `${url}?token=${this.$auth.token()}`;
+                let returnAnswer = `${url}?token=${this.$auth.token()}`;
+                this.inAlbum != null ? returnAnswer += `&albumId=${this.inAlbum}` : null;
+                return returnAnswer;
             },
             ResetEditForm() {
                 this.updated === false ? this.images[this.selectedImageId] = this.selectedImageBackup : null;

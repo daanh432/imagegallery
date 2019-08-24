@@ -43,7 +43,23 @@ const routes = [
             auth: false
         }
     },
+    {
+        path: '/users/:userId/albums/:albumId',
+        name: 'users.albums.show',
+        component: Album,
+        meta: {
+            auth: undefined
+        }
+    },
 // USER ROUTES
+    {
+        path: '/users/:userId/albums',
+        name: 'users.albums.index',
+        component: Albums,
+        meta: {
+            auth: true
+        }
+    },
     {
         path: '/dashboard',
         name: 'dashboard.show',
@@ -61,22 +77,6 @@ const routes = [
         }
     },
     {
-        path: '/albums',
-        name: 'albums.index',
-        component: Albums,
-        meta: {
-            auth: true
-        }
-    },
-    {
-        path: '/albums/:albumId',
-        name: 'albums.show',
-        component: Album,
-        meta: {
-            auth: true
-        }
-    },
-    {
         path: '/users/:userId',
         name: 'users.show',
         component: User,
@@ -88,22 +88,6 @@ const routes = [
         path: '/users/:userId/images',
         name: 'users.images.index',
         component: Images,
-        meta: {
-            auth: true
-        }
-    },
-    {
-        path: '/users/:userId/albums',
-        name: 'users.albums.index',
-        component: Albums,
-        meta: {
-            auth: true
-        }
-    },
-    {
-        path: '/users/:userId/albums/:albumId',
-        name: 'users.albums.show',
-        component: Album,
         meta: {
             auth: true
         }

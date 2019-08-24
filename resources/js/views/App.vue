@@ -11,10 +11,10 @@
                         <router-link :to="{ name: 'contact' }"><span uk-icon="icon: mail; ratio: 2"></span> Contact</router-link>
                     </li>
                     <li>
-                        <router-link :to="{ name: 'images.index' }" v-if="$auth.check()"><span uk-icon="icon: image; ratio: 2"></span> Images</router-link>
+                        <router-link :to="{ name: 'users.images.index', params: {userId: $auth.user().id}}" v-if="$auth.check()"><span uk-icon="icon: image; ratio: 2"></span> Images</router-link>
                     </li>
                     <li>
-                        <router-link :to="{ name: 'albums.index' }" v-if="$auth.check()"><span uk-icon="icon: thumbnails; ratio: 2"></span> Albums</router-link>
+                        <router-link :to="{ name: 'users.albums.index', params: {userId: $auth.user().id} }" v-if="$auth.check()"><span uk-icon="icon: thumbnails; ratio: 2"></span> Albums</router-link>
                     </li>
                     <li class="uk-nav-header">Profile</li>
                     <li class="uk-nav-divider"></li>

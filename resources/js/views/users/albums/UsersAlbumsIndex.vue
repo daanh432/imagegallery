@@ -18,6 +18,12 @@
                                 <textarea class="uk-textarea" id="description" name="Description" placeholder="Description of this album" rows="10" v-model="form.description"></textarea>
                             </div>
                         </div>
+
+                        <div class="uk-margin uk-grid-small uk-child-width1-1 uk-child-width-1-3@s uk-grid">
+                            <label @click="form.access_level = 0"><input :checked="form.access_level === 0" class="uk-radio" name="accessLevel" type="radio"> Only for my eyes</label>
+                            <label @click="form.access_level = 1"><input :checked="form.access_level === 1" class="uk-radio" name="accessLevel" type="radio"> Password Protected</label>
+                            <label @click="form.access_level = 2"><input :checked="form.access_level === 2" class="uk-radio" name="accessLevel" type="radio"> Publicly accessible</label>
+                        </div>
                     </form>
 
                     <p class="uk-text-right">
@@ -39,7 +45,7 @@
                     <div class="uk-grid-small uk-child-width-1-1 uk-child-width-1-2@m uk-child-width-1-3@l uk-child-width-1-4@xl" uk-grid>
                         <div :key="'album-' + album.id" class="imageContainer" v-for="(album, key) in albums">
                             <span :key="'album-' + album.id + '-edit-button'" @click="EditAlbum(album.id)" class="uk-icon-button uk-button-default editImageIcon" uk-icon="icon: pencil"></span>
-                            <router-link :key="'album-' + album.id + '-link'" :to="{ name: 'albums.show', params: {albumId: album.id}}" class="imageThumbnail">
+                            <router-link :key="'album-' + album.id + '-link'" :to="{ name: 'users.albums.show', params: {userId: userId, albumId: album.id}}" class="imageThumbnail">
                                 <lazy-component :key="'lazy-' + album.id + album.randomImage.name + album.name" @show="ShowImage($event, album.randomImage.thumbUrl)">
                                     <img :alt="'Random Image From' + album.randomImage.name" :key="'img-' + album.id" class="uk-width-1-1">
                                     <p :key="'album-' + album.id + '-name'" class="uk-text-center uk-margin-remove-top">{{ album.name }}</p>
@@ -160,6 +166,7 @@
                     axios.post(`users/${this.userId}/albums`, {
                         name: this.form.name,
                         description: this.form.description,
+                        access_level: this.form.access_level,
                         headers: {}
                     }).then(response => {
                         this.albums.push(response.data.data);
@@ -178,6 +185,7 @@
                         axios.post(`users/${this.userId}/albums/${this.form.id}`, {
                             name: this.form.name,
                             description: this.form.description,
+                            access_level: this.form.access_level,
                             '_method': 'PATCH'
                         }).then(response => {
                             this.albums[key] = Object.assign({}, response.data.data);
