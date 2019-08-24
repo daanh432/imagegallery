@@ -102,7 +102,7 @@ class AlbumsController extends Controller
             } else {
                 $album->name = $request->get('name');
                 $album->description = $request->get('description');
-                $album->Images()->sync($request->get('images'));
+                $request->get('images', null) != null ? $album->Images()->sync($request->get('images', null)) : null;
                 $album->save();
                 return new AlbumResource($album);
             }

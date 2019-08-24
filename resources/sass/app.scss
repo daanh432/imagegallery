@@ -126,12 +126,22 @@ body, html {
     z-index: 10;
 }
 
-#dragAndDropForm {
-    //position: fixed;
-    //top: 0;
-    //right: 0;
-    //bottom: 0;
-    //left: 0;
+.imageThumbnail div {
+    height: 0;
+    padding-top: 75%;
+    width: 100%;
+    position: relative;
+}
+
+.imageThumbnail img {
+    object-fit: cover;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 100%;
+    width: 100%;
+    position: absolute;
 }
 
 #navbarLogoImage {

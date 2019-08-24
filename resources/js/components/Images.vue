@@ -8,7 +8,7 @@
         <div ref="ImageEditModal" uk-modal v-on:hidden="ResetEditForm">
             <div class="uk-modal-dialog uk-modal-body" v-if="selectedImageId != null">
                 <h2 class="uk-modal-title">Update Image Information</h2>
-                <img :alt="images[selectedImageId].url" :src="images[selectedImageId].url">
+                <img :alt="images[selectedImageId].url" :src="AddTokenToUrl(images[selectedImageId].url)">
                 <form class="uk-form-blank">
                     <div class="uk-margin">
                         <label class="uk-form-label" for="name">Image Name</label>
@@ -36,12 +36,11 @@
             <div :key="keyPrefix + '-imgContainer-' + image.id" @click.right="OpenMenu($event, image.id)" class="imageContainer" v-for="(image, key) in images">
                 <input :checked="currentSelectedImages.includes(image.id)" @click="SelectImage($event, image.id)" class="uk-checkbox selectImageIcon" type="checkbox" v-if="selectBoxes">
                 <span @click="EditImage(image.id)" class="uk-icon-button uk-button-default editImageIcon" uk-icon="icon: pencil" v-if="!selectBoxes"></span>
-                <lazy-component :key="keyPrefix + '-lazy-' + image.id">
-                    <!-- @show="ShowImage($event, image.thumbUrl)" -->
-                    <a :data-caption="image.description != null ? image.description : ''" :href="image.url + '?token=' + $auth.token()" :key="keyPrefix + '-a-' + image.id" class="imageThumbnail">
+                <a :data-caption="image.description != null ? image.description : ''" :href="image.url + '?token=' + $auth.token()" :key="keyPrefix + '-a-' + image.id" class="imageThumbnail">
+                    <lazy-component :key="keyPrefix + '-lazy-' + image.id + '-' + image.name">
                         <img :alt="image.name" :key="keyPrefix + '-img-' + image.id" :src="AddTokenToUrl(image.thumbUrl)" class="uk-width-1-1">
-                    </a>
-                </lazy-component>
+                    </lazy-component>
+                </a>
             </div>
         </div>
         <div class="uk-text-center" uk-grid v-if="meta">

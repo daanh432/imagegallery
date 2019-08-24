@@ -37,12 +37,12 @@
                 </div>
                 <div>
                     <div class="uk-grid-small uk-child-width-1-1 uk-child-width-1-2@m uk-child-width-1-3@l uk-child-width-1-4@xl" uk-grid>
-                        <div :key="album.id" class="imageContainer" v-for="(album, key) in reversedItems">
-                            <span @click="EditAlbum(album.id)" class="uk-icon-button uk-button-default editImageIcon" uk-icon="icon: pencil"></span>
-                            <router-link :to="{ name: 'albums.show', params: {albumId: album.id}}" class="imageThumbnail">
-                                <lazy-component :key="'lazy-' + album.id" @show="ShowImage($event, album.randomImage.thumbUrl)">
+                        <div :key="'album-' + album.id" class="imageContainer" v-for="(album, key) in albums">
+                            <span :key="'album-' + album.id + '-edit-button'" @click="EditAlbum(album.id)" class="uk-icon-button uk-button-default editImageIcon" uk-icon="icon: pencil"></span>
+                            <router-link :key="'album-' + album.id + '-link'" :to="{ name: 'albums.show', params: {albumId: album.id}}" class="imageThumbnail">
+                                <lazy-component :key="'lazy-' + album.id + album.randomImage.name + album.name" @show="ShowImage($event, album.randomImage.thumbUrl)">
                                     <img :alt="'Random Image From' + album.randomImage.name" :key="'img-' + album.id" class="uk-width-1-1">
-                                    <p class="uk-text-center uk-margin-remove-top">{{ album.name }}</p>
+                                    <p :key="'album-' + album.id + '-name'" class="uk-text-center uk-margin-remove-top">{{ album.name }}</p>
                                 </lazy-component>
                             </router-link>
                         </div>
@@ -75,6 +75,7 @@
         data() {
             return {
                 form: {
+                    id: null,
                     name: null,
                     description: null,
                 },
@@ -89,9 +90,6 @@
         },
 
         computed: {
-            reversedItems() {
-                return this.albums.slice().reverse();
-            },
             nextPage() {
                 if (!this.meta || this.meta.current_page >= this.meta.last_page) {
                     return;
@@ -137,10 +135,9 @@
                 }, function () {
                     // Do something or nothing if rejected
                 });
-
             },
             EditAlbum(albumId) {
-                this.form = Object.assign({}, this.albums.find(album => album.id === albumId));
+                this.form = $.extend({}, this.albums.find(album => album.id === albumId));
                 window.UIkit.modal(this.$refs.AlbumModal).show();
                 this.updating = true;
             },
@@ -153,6 +150,7 @@
             ResetForm() {
                 this.form.name = '';
                 this.form.description = '';
+                this.form.id = null;
                 this.creating = false;
                 this.updating = false;
             },
@@ -175,16 +173,25 @@
                         });
                     });
                 } else if (this.updating) {
-                    axios.post('').then(response => {
-
-                    }).catch(response => {
-                        window.UIkit.notification({
-                            message: 'Something went wrong when trying to update this album. Please try again later or contact us.',
-                            status: 'danger',
-                            pos: 'bottom-center',
-                            timeout: 5000
+                    let key = this.albums.findIndex(album => album.id === this.form.id);
+                    if (key !== -1 || key != null) {
+                        axios.post(`users/${this.userId}/albums/${this.form.id}`, {
+                            name: this.form.name,
+                            description: this.form.description,
+                            '_method': 'PATCH'
+                        }).then(response => {
+                            this.albums[key] = Object.assign({}, response.data.data);
+                            this.albums = Array.from(this.albums);
+                            window.UIkit.modal(this.$refs.AlbumModal).hide();
+                        }).catch(response => {
+                            window.UIkit.notification({
+                                message: 'Something went wrong when trying to update this album. Please try again later or contact us.',
+                                status: 'danger',
+                                pos: 'bottom-center',
+                                timeout: 5000
+                            });
                         });
-                    });
+                    }
                 }
             },
             GoToNext() {
