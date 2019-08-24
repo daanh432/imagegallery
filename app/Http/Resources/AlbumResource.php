@@ -29,6 +29,7 @@ class AlbumResource extends JsonResource
             'name' => $this->name,
             'description' => $this->description,
             'images' => ImageResource::collection($images),
+            'access_level' => $this->access_level,
             'randomImage' => $images->count() != 0 ? new ImageResource($randomImage) : $randomImage
         ];
     }
