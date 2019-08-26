@@ -114,16 +114,16 @@
                 this.menu.left = left + 'px';
             },
             OpenMenu(e, id) {
-                if (this.menu.loading === false) {
-                    this.menu.view = this.authorized;
+                if (this.menu.loading === false && this.authorized) {
+                    this.menu.view = true;
                     this.menu.id = id;
                     this.menu.top = window.scrollY + 10 + 'px';
                     this.$nextTick(() => {
                         this.$refs.rightClickMenu.focus();
                         this.SetMenu(e.y, e.x)
                     });
-                    e.preventDefault();
                 }
+                e.preventDefault();
             },
             CloseMenu() {
                 this.menu.view = false;

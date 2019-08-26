@@ -6,7 +6,7 @@
                     <h1>Add Images to {{ this.AlbumName }}</h1>
                 </div>
                 <div class="uk-modal-body" uk-overflow-auto>
-                    <Images :currentSelectedImages="album.images.map(a => a.id)" :enable-selection="true" :images="availableImages" :meta="null" :token="$auth.token()" :userId="userId" @selectionChange="selectedImages = $event" input-key-prefix="laksE2sJNKUtsdfl3ujusiFCJStoakaBo28iSDAGH83746Yib42matrijGBUuY7"></Images>
+                    <Images :currentSelectedImages="album.images.map(a => a.id)" :enable-selection="true" :images="availableImages" :inputAuthorized="authorized" :meta="null" :token="$auth.token()" :userId="userId" @selectionChange="selectedImages = $event" input-key-prefix="laksE2sJNKUtsdfl3ujusiFCJStoakaBo28iSDAGH83746Yib42matrijGBUuY7"></Images>
                 </div>
                 <div class="uk-modal-footer">
                     <p class="uk-text-right">
@@ -174,7 +174,6 @@
             }
             ,
             RemoveImageFromAlbum(event) {
-                console.log(event);
                 if (this.album != null && this.album.images != null && event != null) {
                     let key = this.album.images.findIndex(image => image.id === event);
                     if (key !== -1) {

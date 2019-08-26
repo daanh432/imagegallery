@@ -73,7 +73,6 @@
             UploadImage() {
                 const file = this.files[0];
                 let formData = new FormData();
-                console.log(file.lastModifiedDate);
                 formData.append('date', file.lastModified);
                 formData.append('newImage', file);
                 this.files.splice(0, 1);
