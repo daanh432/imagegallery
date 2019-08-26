@@ -6,7 +6,7 @@
                     <h1>Add Images to {{ this.AlbumName }}</h1>
                 </div>
                 <div class="uk-modal-body" uk-overflow-auto>
-                    <Images :currentSelectedImages="album.images.map(a => a.id)" :enable-selection="true" :images="availableImages" :meta="null" :userId="userId" @selectionChange="selectedImages = $event" input-key-prefix="laksE2sJNKUtsdfl3ujusiFCJStoakaBo28iSDAGH83746Yib42matrijGBUuY7"></Images>
+                    <Images :currentSelectedImages="album.images.map(a => a.id)" :enable-selection="true" :images="availableImages" :meta="null" :token="$auth.token()" :userId="userId" @selectionChange="selectedImages = $event" input-key-prefix="laksE2sJNKUtsdfl3ujusiFCJStoakaBo28iSDAGH83746Yib42matrijGBUuY7"></Images>
                 </div>
                 <div class="uk-modal-footer">
                     <p class="uk-text-right">
@@ -27,15 +27,30 @@
                             <button class="uk-button uk-button-small uk-button-default" tabindex="-1" type="button"><span uk-icon="icon: push"></span> Upload Images</button>
                         </div>
                     </div>
-                    <div>
-                        <Images :enable-selection="false" :images="this.sortedImages" :in-album="album.id" :input-authorized="authorized" :meta="null" :userId="userId" input-key-prefix="laksE2smatrijGJNKUtsdfl3utoa46YiBo28iSDAGH837b42kajusiFCJSBUuY7" v-on:removeImageFromAlbum="RemoveImageFromAlbum($event)"></Images>
+                    <div v-if="$auth.ready()">
+                        <Images :enable-selection="false" :images="this.sortedImages" :in-album="album.id" :input-authorized="authorized" :meta="null" :token="$auth.token() != null ? $auth.token() : access_password" :userId="userId" input-key-prefix="laksE2smatrijGJNKUtsdfl3utoa46YiBo28iSDAGH837b42kajusiFCJSBUuY7" v-on:removeImageFromAlbum="RemoveImageFromAlbum($event)"></Images>
                     </div>
                 </div>
             </div>
         </form>
+        <div v-if="show_auth">
+            <div class="uk-align-center uk-card uk-card-default uk-card-hover uk-card-body uk-width-1-2@m uk-margin-large-top">
+                <div class="uk-card-title">Login</div>
+                <form @submit.prevent="AuthenticateAlbum" autocomplete="off" class="uk-form-horizontal" method="post">
+                    <div class="uk-margin">
+                        <label class="uk-form-label" for="access_password">Access Password</label>
+                        <div class="uk-form-controls">
+                            <input class="uk-input uk-border-rounded" id="access_password" name="Access Password" placeholder="Password" type="password" v-model="access_password" v-validate="'required'">
+                            <span>{{ errors.first('Access Password') }}</span>
+                        </div>
+                    </div>
+                    <button class="uk-button uk-button-default uk-align-center uk-margin-remove-bottom uk-margin-top" type="submit">Login</button>
+                </form>
+            </div>
+        </div>
         <div v-if="has_error">
             <div class="uk-container uk-background-primary uk-border-rounded uk-margin-large-top uk-padding">
-                <h1 class="uk-text-center">An error occurred during load. Please try again later.</h1>
+                <h1 class="uk-text-center">{{ errorMessage != null ? errorMessage : 'An error occurred during load. Please try again later' }}.</h1>
             </div>
         </div>
     </div>
@@ -57,9 +72,12 @@
 
         data() {
             return {
+                show_auth: false,
+                access_password: null,
                 userId: null,
                 authorized: false,
                 has_error: false,
+                errorMessage: null,
                 album: null,
                 dragAndDropCapable: false,
                 files: [],
@@ -96,6 +114,24 @@
         },
 
         methods: {
+            AuthenticateAlbum() {
+                this.$validator.validate('Access Password', this.access_password).then(() => {
+                    if (this.errors.any()) {
+                        return window.UIkit.notification({
+                            message: 'Please resolve validation errors before submitting.',
+                            status: 'warning',
+                            pos: 'bottom-center',
+                            timeout: 2500
+                        });
+                    }
+                    let userId = this.$route.params.userId != null ? this.$route.params.userId : null;
+                    let token = this.access_password;
+                    let params = {userId, page: this.$route.query.page, albumId: this.$route.params.albumId, access_password: token};
+                    AlbumApi.GetAlbum(params, token, (err, data) => {
+                        this.SetData(err, data);
+                    });
+                });
+            },
             AddImages() {
                 let params = {userId: this.userId, page: this.$route.query.page};
                 ImageApi.GetImages(params, this.$auth.token(), (err, data) => {
@@ -120,20 +156,23 @@
                     }
                 });
                 window.UIkit.modal(this.$refs.AddImageModal).show();
-            },
+            }
+            ,
             AddImagesSave() {
                 axios.post(`users/${this.userId}/albums/${this.album.id}`, {
                     '_method': 'PATCH',
                     name: this.album.name,
                     description: this.album.description,
                     images: this.selectedImages,
+                    access_level: this.album.access_level,
                 }).then(response => {
                     this.SetData(null, response.data);
                     window.UIkit.modal(this.$refs.AddImageModal).hide();
                 }).catch(error => {
                     this.SetData(error, error.response.data);
                 });
-            },
+            }
+            ,
             RemoveImageFromAlbum(event) {
                 console.log(event);
                 if (this.album != null && this.album.images != null && event != null) {
@@ -144,7 +183,8 @@
                         this.AddImagesSave();
                     }
                 }
-            },
+            }
+            ,
             UploadImage() {
                 const file = this.files[0];
                 let formData = new FormData();
@@ -191,7 +231,8 @@
                     });
                     this.UploadImage();
                 }
-            },
+            }
+            ,
             UploadDialog(e) {
                 let form = e.target;
                 for (let i = 0; i < form.files.length; i++) {
@@ -199,41 +240,43 @@
                 }
                 // Upload instantly
                 this.UploadImage();
-            },
+            }
+            ,
             SetData(err, data) {
                 if (err) {
-                    this.has_error = true;
-                    window.UIkit.notification({
-                        message: 'Something went wrong when trying to fetch data. Please try again later or contact us.',
-                        status: 'danger',
-                        pos: 'bottom-center',
-                        timeout: 5000
-                    });
+                    this.errorMessage = err.response.status === 404 ? 'It looks like this album doesn\'t exist' : null;
+                    if (err.response.status === 403) {
+                        this.has_error = false;
+                        this.show_auth = true;
+                    } else {
+                        this.has_error = true;
+                        window.UIkit.notification({
+                            message: 'Something went wrong when trying to fetch data. Please try again later or contact us.',
+                            status: 'danger',
+                            pos: 'bottom-center',
+                            timeout: 5000
+                        });
+                    }
                 } else {
                     this.has_error = false;
                     this.authorized = data.authorized;
                     this.album = data.data;
+                    this.show_auth = false;
                 }
             }
         },
 
         beforeRouteEnter(to, from, next) {
-            next(vm => {
-                vm.$auth.fetch({
-                    params: {},
-                    success: function () {
-                        let userId = to.params.userId != null ? to.params.userId : vm.$auth.user().id;
-                        let params = {userId, page: to.query.page, albumId: to.params.albumId};
-                        AlbumApi.GetAlbum(params, vm.$auth.token(), (err, data) => {
-                            vm.SetData(err, data);
-                        });
-                    },
-                    error: function () {
-                        vm.has_error = true;
-                    },
+            let token = window.localStorage.getItem('ImageGallery-Auth-Token');
+            let userId = to.params.userId != null ? to.params.userId : null;
+            let params = {userId, page: to.query.page, albumId: to.params.albumId};
+            AlbumApi.GetAlbum(params, token, (err, data) => {
+                next(vm => {
+                    vm.SetData(err, data);
                 });
             });
-        },
+        }
+        ,
 
         beforeRouteUpdate(to, from, next) {
             let userId = to.params.userId != null ? to.params.userId : this.$auth.user().id;
@@ -242,7 +285,8 @@
                 this.SetData(err, data);
                 next();
             });
-        },
+        }
+        ,
 
         mounted() {
             this.userId = this.$route != null && this.$route.params != null && this.$route.params.userId != null ? this.$route.params.userId : this.$auth.user().id;
@@ -265,6 +309,7 @@
                     }.bind(this));
                 }
             });
-        },
+        }
+        ,
     }
 </script>

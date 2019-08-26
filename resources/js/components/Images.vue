@@ -35,8 +35,8 @@
         <div class="uk-grid-small uk-child-width-1-1 uk-child-width-1-3@m uk-child-width-1-4@l uk-child-width-1-5@xl" uk-grid uk-lightbox="animation: slide">
             <div :key="keyPrefix + '-imgContainer-' + image.id" @click.right="OpenMenu($event, image.id)" class="imageContainer" v-for="(image, key) in images">
                 <input :checked="currentSelectedImages.includes(image.id)" @click="SelectImage($event, image.id)" class="uk-checkbox selectImageIcon" type="checkbox" v-if="selectBoxes">
-                <span @click="EditImage(image.id)" class="uk-icon-button uk-button-default editImageIcon" uk-icon="icon: pencil" v-if="!selectBoxes"></span>
-                <a :data-caption="image.description != null ? image.description : ''" :href="image.url + '?token=' + $auth.token()" :key="keyPrefix + '-a-' + image.id" class="imageThumbnail">
+                <span @click="EditImage(image.id)" class="uk-icon-button uk-button-default editImageIcon" uk-icon="icon: pencil" v-if="!selectBoxes && authorized"></span>
+                <a :data-caption="image.description != null ? image.description : ''" :href="AddTokenToUrl(image.url)" :key="keyPrefix + '-a-' + image.id" class="imageThumbnail">
                     <lazy-component :key="keyPrefix + '-lazy-' + image.id + '-' + image.name">
                         <img :alt="image.name" :key="keyPrefix + '-img-' + image.id" :src="AddTokenToUrl(image.thumbUrl)" class="uk-width-1-1">
                     </lazy-component>
@@ -79,7 +79,11 @@
                 type: String
             },
             inputAuthorized: {
-                type: Boolean
+                type: Boolean,
+                required: true,
+            },
+            token: {
+                required: true,
             }
         },
 
@@ -111,7 +115,7 @@
             },
             OpenMenu(e, id) {
                 if (this.menu.loading === false) {
-                    this.menu.view = true;
+                    this.menu.view = this.authorized;
                     this.menu.id = id;
                     this.menu.top = window.scrollY + 10 + 'px';
                     this.$nextTick(() => {
@@ -136,7 +140,7 @@
              * @return {string}
              */
             AddTokenToUrl(url) {
-                let returnAnswer = `${url}?token=${this.$auth.token()}`;
+                let returnAnswer = `${url}?token=${this.token}`;
                 this.inAlbum != null ? returnAnswer += `&albumId=${this.inAlbum}` : null;
                 return returnAnswer;
             },
@@ -155,7 +159,7 @@
             },
             UpdateImage() {
                 if (this.images[this.selectedImageId] != null) {
-                    const token = this.$auth.token();
+                    const token = this.token;
                     const data = {
                         'name': this.images[this.selectedImageId].name,
                         'description': this.images[this.selectedImageId].description,
@@ -192,7 +196,7 @@
                     window.UIkit.modal.confirm(`Are you sure you want to delete the image ${this.images[key].name} permanently? This deletes the image entirely! Not just from an album.`).then(function () {
                         axios.post(`users/${app.userId}/images/${app.images[key].id}`, {
                             '_method': 'DELETE',
-                            'Authorization': app.$auth.token()
+                            'Authorization': app.token
                         }).then(response => {
                             app.images.splice(key, 1);
                             app.updated = true;
@@ -217,9 +221,10 @@
                 }
             },
             RemoveFromAlbum(imageId) {
-                console.log(`Preparing to delete ${imageId} from album`);
-                this.$emit('removeImageFromAlbum', imageId);
-                this.menu.view = false;
+                if (this.authorized) {
+                    this.$emit('removeImageFromAlbum', imageId);
+                    this.menu.view = false;
+                }
             },
             GoToNext() {
                 this.$router.push({

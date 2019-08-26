@@ -24,6 +24,13 @@
                             <label @click="form.access_level = 1"><input :checked="form.access_level === 1" class="uk-radio" name="accessLevel" type="radio"> Password Protected</label>
                             <label @click="form.access_level = 2"><input :checked="form.access_level === 2" class="uk-radio" name="accessLevel" type="radio"> Publicly accessible</label>
                         </div>
+
+                        <div class="uk-margin" v-if="form.access_level === 1">
+                            <label class="uk-form-label" for="name">Album Password</label>
+                            <div class="uk-form-controls">
+                                <input class="uk-input" id="password" name="Password" placeholder="Public password for this album" type="text" v-model="form.access_password">
+                            </div>
+                        </div>
                     </form>
 
                     <p class="uk-text-right">
@@ -84,6 +91,8 @@
                     id: null,
                     name: null,
                     description: null,
+                    access_level: null,
+                    access_password: null,
                 },
                 userId: null,
                 has_error: false,
@@ -152,10 +161,14 @@
                 this.creating = true;
                 this.form.name = null;
                 this.form.description = null;
+                this.form.access_level = 0;
+                this.form.access_password = null;
             },
             ResetForm() {
                 this.form.name = '';
                 this.form.description = '';
+                this.form.access_level = 0;
+                this.form.access_password = null;
                 this.form.id = null;
                 this.creating = false;
                 this.updating = false;
@@ -167,6 +180,7 @@
                         name: this.form.name,
                         description: this.form.description,
                         access_level: this.form.access_level,
+                        access_password: this.form.access_password,
                         headers: {}
                     }).then(response => {
                         this.albums.push(response.data.data);
@@ -186,6 +200,7 @@
                             name: this.form.name,
                             description: this.form.description,
                             access_level: this.form.access_level,
+                            access_password: this.form.access_password,
                             '_method': 'PATCH'
                         }).then(response => {
                             this.albums[key] = Object.assign({}, response.data.data);

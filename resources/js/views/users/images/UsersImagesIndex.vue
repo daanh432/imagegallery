@@ -11,7 +11,7 @@
                         </div>
                     </div>
                     <div>
-                        <Images :images="sortedImages" :meta="meta" :userId="userId"></Images>
+                        <Images :images="sortedImages" :inputAuthorized="true" :meta="meta" :token="$auth.token()" :userId="userId"></Images>
                     </div>
                 </div>
             </div>
@@ -143,19 +143,12 @@
         },
 
         beforeRouteEnter(to, from, next) {
-            next(vm => {
-                vm.$auth.fetch({
-                    params: {},
-                    success: function () {
-                        let userId = to.params.userId != null ? to.params.userId : vm.$auth.user().id;
-                        let params = {userId, page: to.query.page};
-                        ImageApi.GetImages(params, vm.$auth.token(), (err, data) => {
-                            vm.SetData(err, data);
-                        });
-                    },
-                    error: function () {
-                        vm.has_error = true;
-                    },
+            let token = window.localStorage.getItem('ImageGallery-Auth-Token');
+            let userId = to.params.userId != null ? to.params.userId : null;
+            let params = {userId, page: to.query.page};
+            ImageApi.GetImages(params, token, (err, data) => {
+                next(vm => {
+                    vm.SetData(err, data);
                 });
             });
         },
@@ -167,7 +160,8 @@
                 this.SetData(err, data);
                 next();
             });
-        },
+        }
+        ,
 
         mounted() {
             this.userId = this.$route != null && this.$route.params != null && this.$route.params.userId != null ? this.$route.params.userId : this.$auth.user().id;
@@ -188,6 +182,7 @@
                     this.UploadImage();
                 }.bind(this));
             }
-        },
+        }
+        ,
     }
 </script>

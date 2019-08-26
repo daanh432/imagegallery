@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 class AlbumsController extends Controller
@@ -62,7 +63,7 @@ class AlbumsController extends Controller
                 $album->name = $request->get('name');
                 $album->description = $request->get('description');
                 $album->access_level = $request->get('access_level');
-                $album->access_password = $request->get('access_password', null);
+                $album->access_password = $request->get('access_password', null) != null && $request->get('access_password', '') != '' ? Hash::make($request->get('access_password')) : null;
                 $album->user_id = $user->id;
                 $album->save();
                 return new AlbumResource($album);
@@ -75,15 +76,19 @@ class AlbumsController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param Album $albums
+     * @param Request $request
+     * @param User $user
+     * @param Album $album
      * @return AlbumResource|Response
      */
-    public function show(User $user, Album $album)
+    public function show(Request $request, User $user, Album $album)
     {
-        if (($this->Guard()->check() && $this->Guard()->user() != null && $this->Guard()->user()->can('view', $album)) || $album->access_level === 2) {
+        if (($this->Guard()->check() && $this->Guard()->user() != null && $this->Guard()->user()->can('view', $album)) || $album->access_level === 2 || ($album->access_level === 1 && Hash::check($request->get('access_password', null), $album->access_password))) {
             return response()->json(['data' => new AlbumResource($album), 'authorized' => $this->Guard()->user() != null ? $this->Guard()->user()->can('update', $album) : false]);
+        } else if ($album->access_level === 0) {
+            return abort(404);
         } else {
-            return response()->json(['status' => 'Unauthorized', 'Authenticate' => false], 403);
+            return response()->json(['status' => 'Unauthorized', 'Authenticate' => $album->access_level === 1 ? true : false], 403);
         }
     }
 
@@ -114,10 +119,10 @@ class AlbumsController extends Controller
                 $album->name = $request->get('name');
                 $album->description = $request->get('description');
                 $album->access_level = $request->get('access_level');
-                $album->access_password = $request->get('access_password', $album->access_password);
+                $album->access_password = $request->get('access_password', null) != null ? Hash::make($request->get('access_password')) : $album->access_password;
                 $request->get('images', null) != null ? $album->Images()->sync($request->get('images', null)) : null;
                 $album->save();
-                return new AlbumResource($album);
+                return response()->json(['data' => new AlbumResource($album), 'authorized' => $this->Guard()->user() != null ? $this->Guard()->user()->can('update', $album) : false]);
             }
         } else {
             return response()->json(['status' => 'Unauthorized', 'message' => 'You are not authorized to update albums for this user'], 401);

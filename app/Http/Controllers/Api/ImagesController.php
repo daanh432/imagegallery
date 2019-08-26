@@ -15,6 +15,7 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -51,10 +52,14 @@ class ImagesController extends Controller
         if ($this->Guard()->check() && $this->Guard()->user() != null) {
             abort_if($this->Guard()->user() == null || $this->Guard()->user()->cant('view', $image), 403);
             return $this->ReturnImage($user, $imagePath);
-        } else if ($request->get('albumId', null) != null || $request->get('access_password', null) != null && $image != null) {
+        } else if ($request->get('albumId', null) != null && $image != null) {
             $album = Album::find($request->get('albumId', null));
-            if ($album != null && $album->access_level === 2) {
-                return $this->ReturnImage($user, $imagePath);
+            if ($image->Albums()->get()->contains($album->id)) {
+                if ($album != null && $album->access_level === 2) {
+                    return $this->ReturnImage($user, $imagePath);
+                } else if ($album != null && $album->access_level === 1 && Hash::check($request->get('token', null), $album->access_password)) {
+                    return $this->ReturnImage($user, $imagePath);
+                }
             }
         }
 
