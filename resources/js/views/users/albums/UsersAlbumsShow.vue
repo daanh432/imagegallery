@@ -145,7 +145,6 @@
                         });
                     } else {
                         this.has_error = false;
-                        this.authorized = data.authorized;
                         this.availableImages = data.data.sort((a, b) => {
                             if (a.timestamp < b.timestamp)
                                 return 1;
@@ -245,6 +244,14 @@
                 if (err) {
                     this.errorMessage = err.response.status === 404 ? 'It looks like this album doesn\'t exist' : null;
                     if (err.response.status === 403) {
+                        if (this.show_auth === true) {
+                            return window.UIkit.notification({
+                                message: 'It looks like the provided credentials are wrong.',
+                                status: 'danger',
+                                pos: 'bottom-center',
+                                timeout: 5000
+                            });
+                        }
                         this.has_error = false;
                         this.show_auth = true;
                     } else {
