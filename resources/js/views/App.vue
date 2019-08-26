@@ -19,7 +19,7 @@
                     <li class="uk-nav-header">Profile</li>
                     <li class="uk-nav-divider"></li>
                     <li v-if="$auth.check()">
-                        <router-link :to="{ name: 'dashboard.show' }"><span uk-icon="icon: user; ratio: 2"></span> {{ $auth.user().name }}</router-link>
+                        <router-link :to="{ name: 'users.show', params: {userId: $auth.user().id} }"><span uk-icon="icon: user; ratio: 2"></span> {{ $auth.user().name }}</router-link>
                     </li>
                     <li v-if="$auth.check()">
                         <a @click.prevent="$auth.logout()" href=""><span uk-icon="icon: sign-out; ratio: 2"></span> Logout</a>

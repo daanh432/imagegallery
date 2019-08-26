@@ -61,22 +61,6 @@ const routes = [
         }
     },
     {
-        path: '/dashboard',
-        name: 'dashboard.show',
-        component: User,
-        meta: {
-            auth: true
-        }
-    },
-    {
-        path: '/images',
-        name: 'images.index',
-        component: Images,
-        meta: {
-            auth: true
-        }
-    },
-    {
         path: '/users/:userId',
         name: 'users.show',
         component: User,

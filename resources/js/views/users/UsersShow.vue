@@ -49,14 +49,12 @@
 
         computed: {
             ImageRoute() {
-                let originalId = this.$route.params.userId ? this.$route.params.userId + '' : this.$auth.user().id = '';
-                let userId = this.$auth.user().id + '';
-                return originalId === userId ? {name: 'images.index'} : {name: 'users.images.index', params: {userId: originalId}};
+                let originalId = this.$route.params.userId + '';
+                return {name: 'users.images.index', params: {userId: originalId}};
             },
             AlbumRoute() {
-                let originalId = this.$route.params.userId ? this.$route.params.userId + '' : this.$auth.user().id = '';
-                let userId = this.$auth.user().id + '';
-                return originalId === userId ? {name: 'albums.index'} : {name: 'users.albums.index', params: {userId: originalId}};
+                let originalId = this.$route.params.userId + '';
+                return {name: 'users.albums.index', params: {userId: originalId}};
             }
         },
 
@@ -64,8 +62,6 @@
             let userId = undefined;
             if (to.params != null && to.params.userId != null) {
                 userId = to.params.userId;
-            } else {
-                userId = window.VueAPP.$auth.user().id;
             }
             let token = window.localStorage.getItem('ImageGallery-Auth-Token');
             getUser(userId, token, (err, data) => {
@@ -77,8 +73,6 @@
             let userId = undefined;
             if (to.params != null && to.params.userId != null) {
                 userId = to.params.userId;
-            } else {
-                userId = this.$auth.user().id;
             }
             getUser(userId, this.$auth.token(), (err, data) => {
                 this.SetData(err, data);
