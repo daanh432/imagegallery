@@ -9,13 +9,15 @@
                         <div class="uk-margin">
                             <label class="uk-form-label" for="name">Album Name</label>
                             <div class="uk-form-controls">
-                                <input class="uk-input" id="name" name="Name" placeholder="Name of this album" type="text" v-model="form.name">
+                                <input class="uk-input" id="name" name="Name" placeholder="Name of this album" type="text" v-model="form.name" v-validate="'required|max:250'">
+                                <span>{{ errors.first('Name') }}</span>
                             </div>
                         </div>
                         <div class="uk-margin">
                             <label class="uk-form-label" for="name">Album Description</label>
                             <div class="uk-form-controls">
-                                <textarea class="uk-textarea" id="description" name="Description" placeholder="Description of this album" rows="10" v-model="form.description"></textarea>
+                                <textarea class="uk-textarea" id="description" name="Description" placeholder="Description of this album" rows="10" v-model="form.description" v-validate="'required|max:2000'"></textarea>
+                                <span>{{ errors.first('Description') }}</span>
                             </div>
                         </div>
 
@@ -174,48 +176,58 @@
                 this.updating = false;
             },
             SaveAlbum() {
-                if (this.creating) {
-                    let app = this;
-                    axios.post(`users/${this.userId}/albums`, {
-                        name: this.form.name,
-                        description: this.form.description,
-                        access_level: this.form.access_level,
-                        access_password: this.form.access_password,
-                        headers: {}
-                    }).then(response => {
-                        this.albums.push(response.data.data);
-                        window.UIkit.modal(this.$refs.AlbumModal).hide();
-                    }).catch(response => {
-                        window.UIkit.notification({
-                            message: 'Something went wrong when trying to create this album. Please try again later or contact us.',
-                            status: 'danger',
+                this.$validator.validateAll().then(() => {
+                    if (this.errors.any()) {
+                        return window.UIkit.notification({
+                            message: 'Please resolve validation errors before submitting.',
+                            status: 'warning',
                             pos: 'bottom-center',
-                            timeout: 5000
+                            timeout: 2500
                         });
-                    });
-                } else if (this.updating) {
-                    let key = this.albums.findIndex(album => album.id === this.form.id);
-                    if (key !== -1 || key != null) {
-                        axios.post(`users/${this.userId}/albums/${this.form.id}`, {
+                    }
+                    if (this.creating) {
+                        let app = this;
+                        axios.post(`users/${this.userId}/albums`, {
                             name: this.form.name,
                             description: this.form.description,
                             access_level: this.form.access_level,
                             access_password: this.form.access_password,
-                            '_method': 'PATCH'
+                            headers: {}
                         }).then(response => {
-                            this.albums[key] = Object.assign({}, response.data.data);
-                            this.albums = Array.from(this.albums);
+                            this.albums.push(response.data.data);
                             window.UIkit.modal(this.$refs.AlbumModal).hide();
                         }).catch(response => {
                             window.UIkit.notification({
-                                message: 'Something went wrong when trying to update this album. Please try again later or contact us.',
+                                message: 'Something went wrong when trying to create this album. Please try again later or contact us.',
                                 status: 'danger',
                                 pos: 'bottom-center',
                                 timeout: 5000
                             });
                         });
+                    } else if (this.updating) {
+                        let key = this.albums.findIndex(album => album.id === this.form.id);
+                        if (key !== -1 || key != null) {
+                            axios.post(`users/${this.userId}/albums/${this.form.id}`, {
+                                name: this.form.name,
+                                description: this.form.description,
+                                access_level: this.form.access_level,
+                                access_password: this.form.access_password,
+                                '_method': 'PATCH'
+                            }).then(response => {
+                                this.albums[key] = Object.assign({}, response.data.data);
+                                this.albums = Array.from(this.albums);
+                                window.UIkit.modal(this.$refs.AlbumModal).hide();
+                            }).catch(response => {
+                                window.UIkit.notification({
+                                    message: 'Something went wrong when trying to update this album. Please try again later or contact us.',
+                                    status: 'danger',
+                                    pos: 'bottom-center',
+                                    timeout: 5000
+                                });
+                            });
+                        }
                     }
-                }
+                });
             },
             GoToNext() {
                 this.$router.push({
