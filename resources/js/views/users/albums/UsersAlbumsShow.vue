@@ -243,6 +243,7 @@
             SetData(err, data) {
                 if (err) {
                     this.errorMessage = err.response.status === 404 ? 'It looks like this album doesn\'t exist' : null;
+                    this.show_auth = err.response.status === 404 ? false : this.show_auth;
                     if (err.response.status === 403) {
                         if (this.show_auth === true) {
                             return window.UIkit.notification({
