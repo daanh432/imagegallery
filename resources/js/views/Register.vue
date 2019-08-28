@@ -7,7 +7,7 @@
                     <label class="uk-form-label" for="name">Full Name</label>
                     <div class="uk-form-controls">
                         <input class="uk-input uk-border-rounded" id="name" name="name" type="text" placeholder="Your name" v-model="name" v-validate="'required'">
-                        <span>{{ errors.first('email') }}</span>
+                        <span>{{ errors.first('name') }}</span>
                     </div>
                 </div>
                 <div class="uk-margin">
