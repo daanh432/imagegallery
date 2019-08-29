@@ -269,19 +269,12 @@
         },
 
         beforeRouteEnter(to, from, next) {
-            next(vm => {
-                vm.$auth.fetch({
-                    params: {},
-                    success: function () {
-                        let userId = to.params.userId != null ? to.params.userId : vm.$auth.user().id;
-                        let params = {userId, page: to.query.page};
-                        AlbumApi.GetAlbums(params, vm.$auth.token(), (err, data) => {
-                            vm.SetData(err, data);
-                        });
-                    },
-                    error: function () {
-                        vm.has_error = true;
-                    },
+            let token = window.localStorage.getItem('ImageGallery-Auth-Token');
+            let userId = to.params.userId != null ? to.params.userId : null;
+            let params = {userId, page: to.query.page};
+            AlbumApi.GetAlbums(params, token, (err, data) => {
+                next(vm => {
+                    vm.SetData(err, data);
                 });
             });
         },
