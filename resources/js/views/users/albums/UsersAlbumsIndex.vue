@@ -55,8 +55,8 @@
                         <div :key="'album-' + album.id" class="imageContainer" v-for="(album, key) in albums">
                             <span :key="'album-' + album.id + '-edit-button'" @click="EditAlbum(album.id)" class="uk-icon-button uk-button-default editImageIcon" uk-icon="icon: pencil"></span>
                             <router-link :key="'album-' + album.id + '-link'" :to="{ name: 'users.albums.show', params: {userId: userId, albumId: album.id}}" class="imageThumbnail">
-                                <lazy-component :key="'lazy-' + album.id + album.randomImage.name + album.name" @show="ShowImage($event, album.randomImage.thumbUrl)">
-                                    <img :alt="'Random Image From' + album.randomImage.name" :key="'img-' + album.id" class="uk-width-1-1">
+                                <lazy-component :key="'lazy-' + album.id + album.randomImage.name + album.name">
+                                    <img :alt="'Random Image From' + album.randomImage.name" :key="'img-' + album.id" :src="AddTokenToUrl(album.randomImage.thumbUrl)" class="uk-width-1-1">
                                     <p :key="'album-' + album.id + '-name'" class="uk-text-center uk-margin-remove-top">{{ album.name }}</p>
                                 </lazy-component>
                             </router-link>
@@ -258,28 +258,13 @@
                     this.meta = data.meta;
                 }
             },
-            ShowImage(event, url) {
-                let app = this;
-                if (url.startsWith('https://')) {
-                    this.$nextTick(() => {
-                        let image = event.$el.querySelector('img');
-                        image.src = url;
-                    });
-                } else {
-                    this.$nextTick(() => {
-                        let image = event.$el.querySelector('img');
-                        axios.get(url, {
-                            responseType: 'arraybuffer',
-                            headers: {
-                                Authorization: `Bearer ${app.$auth.token()}`
-                            }
-                        }).then(response => {
-                            image.src = 'data:image/jpeg;base64,' + new Buffer.from(response.data, 'binary').toString('base64');
-                        }).catch(response => {
-                            image.src = 'http://imagegallery.test/assets/img/placeholder.jpg';
-                        });
-                    });
-                }
+            /**
+             * @return {string}
+             */
+            AddTokenToUrl(url) {
+                let returnAnswer = `${url}?token=${this.$auth.token()}`;
+                this.inAlbum != null ? returnAnswer += `&albumId=${this.inAlbum}` : null;
+                return returnAnswer;
             },
         },
 
