@@ -1,7 +1,7 @@
 @component('mail::message')
     # Contact form submission
 
-    {{ config('mail.to.name') }} you received a message on {{ config('app.url') }}.
+    You received a message on https://daanhendriks.nl/.
 
     First name: {{ $submission->name }}<br>
     Email address: {{ $submission->email }}<br>
