@@ -21,10 +21,14 @@ class UserController extends Controller
 
     public function show(User $user)
     {
-        if (Auth::user()->IsAdmin() || Auth::user()->id === $user->id) {
+        if ($this->Guard()->user() != null && $this->Guard()->user()->IsAdmin() || $this->Guard()->user()->id === $user->id) {
             return new UserResource($user);
         } else {
             return response()->json(['status' => 'error', 'message' => 'You\'re not authorized to view this user\'s information.'], 401);
         }
+    }
+
+    private function Guard() {
+        return Auth::guard('api');
     }
 }
