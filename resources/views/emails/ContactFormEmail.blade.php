@@ -1,7 +1,7 @@
 @component('mail::message')
 # Contact form submission
 
-You received a message on https://daanhendriks.nl/.
+You received a message on https://imagegallery.daanhendriks.nl/.
 
 First name: {{ $submission->name }}<br>
 Email address: {{ $submission->email }}<br>
