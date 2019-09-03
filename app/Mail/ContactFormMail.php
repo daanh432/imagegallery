@@ -19,7 +19,6 @@ class ContactFormMail extends Mailable
     public function __construct($validated)
     {
         $this->submission = (object)$validated;
-        $this->replyTo = $this->submission->email;
     }
 
     /**
@@ -29,7 +28,7 @@ class ContactFormMail extends Mailable
      */
     public function build()
     {
-        return $this->markdown('emails.ContactFormEmail')->with([
+        return $this->replyTo($this->submission->email)->markdown('emails.ContactFormEmail')->with([
             'submission' => $this->submission
         ]);
     }
