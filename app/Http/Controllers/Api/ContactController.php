@@ -25,7 +25,7 @@ class ContactController extends Controller
                 'errors' => $validator->errors()
             ], 422);
         } else {
-            Mail::to(config('mail.admin'))->replyTo($request->get('email'))->send(new ContactFormMail($validator->valid()));
+            Mail::to(config('mail.admin'))->send(new ContactFormMail($validator->valid()));
 
             return redirect(route('index'));
         }

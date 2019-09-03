@@ -19,6 +19,7 @@ class ContactFormMail extends Mailable
     public function __construct($validated)
     {
         $this->submission = (object)$validated;
+        $this->replyTo = $this->submission->email;
     }
 
     /**
