@@ -12,10 +12,11 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr @click="goToUser(user.id)" v-for="(user, key) in users">
+                    <tr @click="goToUser(user.id)" v-for="(user, key) in users" :key="user.id">
                         <td>{{ user.name }}</td>
                         <td>{{ user.email }}</td>
-                        <td>{{ user.role }}</td>
+                        <td v-if="user.role >= 2" @click.stop="">Super Admin</td>
+                        <td v-if="user.role < 2" @click.stop="SwitchRole(user)" :key="user.id + user.role">{{ user.role === 1 ? 'Admin' : 'User' }}</td>
                     </tr>
                     </tbody>
                 </table>
@@ -58,6 +59,28 @@
         },
 
         methods: {
+            SwitchRole(user) {
+                if (user.role < 2) {
+                    axios.post(`users/${user.id}`, {
+                        '_method': 'PATCH',
+                        name: user.name,
+                        email: user.email,
+                        role: user.role === 0 ? 1 : 0,
+                    }).then(response => {
+                        let key = this.users.findIndex(searchUser => searchUser.id === user.id);
+                        this.users[key] = response.data.data;
+                        this.users = Array.from(this.users);
+                        this.$set(this.users, this.users);
+                    }).catch(error => {
+                        window.UIkit.notification({
+                            message: 'Something went wrong when trying to update that user. Please try again later or contact us.',
+                            status: 'danger',
+                            pos: 'bottom-center',
+                            timeout: 5000
+                        });
+                    })
+                }
+            },
             goToUser(userId) {
                 this.$router.push({
                     name: 'users.show',

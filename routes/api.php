@@ -36,6 +36,7 @@ Route::namespace('Api')->group(function () {
         // User profile routes
         Route::get('/users', 'UserController@index');
         Route::get('/users/{user}', 'UserController@show');
+        Route::patch('/users/{user}', 'UserController@update');
 
         // User image overview routes
         Route::get('/users/{user}/images', 'ImagesController@index');
