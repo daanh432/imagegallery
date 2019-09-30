@@ -29,13 +29,15 @@
                 </div>
                 <div class="uk-margin">
                     <div class="uk-form-controls">
-                        <button @click.prevent="sendMessage" class="uk-button uk-button-default uk-border-rounded uk-align-center uk-margin-remove-bottom" type="submit">Send Message</button>
+                        <button @click.prevent="sendMessage" class="uk-button uk-button-default uk-border-rounded uk-align-center uk-margin-remove-bottom" type="submit">Send Message
+                            <div uk-spinner v-if="loading"></div>
+                        </button>
                     </div>
                 </div>
             </form>
         </div>
         <div class="uk-container uk-background-primary uk-border-rounded uk-margin-large-top uk-margin-remove-top@s uk-padding" v-else>
-            <h1 class="uk-align-center">Your message has been send.</h1>
+            <h1 class="uk-text-center">Your message has been send.</h1>
         </div>
     </div>
 </template>
@@ -46,43 +48,51 @@
                 fullName: '',
                 emailAddress: '',
                 message: '',
-                success: false
+                success: false,
+                loading: false,
             }
         },
         methods: {
             sendMessage() {
-                this.$validator.validateAll().then();
-                if (this.errors.any()) {
-                    return window.UIkit.notification({
-                        message: 'Please resolve validation errors before submitting.',
-                        status: 'warning',
-                        pos: 'bottom-center',
-                        timeout: 2500
+                if (this.loading === false) {
+                    this.loading = true;
+                    this.$validator.validateAll().then(() => {
+                        if (this.errors.any()) {
+                            this.loading = false;
+                            return window.UIkit.notification({
+                                message: 'Please resolve validation errors before submitting.',
+                                status: 'warning',
+                                pos: 'bottom-center',
+                                timeout: 2500
+                            });
+                        }
+
+                        let app = this;
+
+                        axios.post('contact', {
+                            name: this.fullName,
+                            email: this.emailAddress,
+                            message: this.message
+                        }).then((data) => {
+                            window.UIkit.notification({
+                                message: 'Message has been delivered.',
+                                status: 'success',
+                                pos: 'bottom-center',
+                                timeout: 10000
+                            });
+                            app.success = true;
+                            app.loading = false;
+                        }).catch((data) => {
+                            window.UIkit.notification({
+                                message: 'Something went wrong trying to send your message. Please try again later.',
+                                status: 'danger',
+                                pos: 'bottom-center',
+                                timeout: 5000
+                            });
+                            app.loading = false;
+                        });
                     });
                 }
-
-                let app = this;
-
-                axios.post('contact', {
-                    name: this.fullName,
-                    email: this.emailAddress,
-                    message: this.message
-                }).then((data) => {
-                    window.UIkit.notification({
-                        message: 'Message has been delivered.',
-                        status: 'success',
-                        pos: 'bottom-center',
-                        timeout: 10000
-                    });
-                    app.success = true;
-                }).catch((data) => {
-                    window.UIkit.notification({
-                        message: 'Something went wrong trying to send your message. Please try again later.',
-                        status: 'danger',
-                        pos: 'bottom-center',
-                        timeout: 5000
-                    });
-                });
             }
         }
     }

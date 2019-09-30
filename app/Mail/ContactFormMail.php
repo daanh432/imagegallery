@@ -28,7 +28,7 @@ class ContactFormMail extends Mailable
      */
     public function build()
     {
-        return $this->markdown('emails.ContactFormEmail')->with([
+        return $this->replyTo($this->submission->email)->markdown('emails.ContactFormEmail')->with([
             'submission' => $this->submission
         ]);
     }

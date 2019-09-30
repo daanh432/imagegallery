@@ -7,7 +7,7 @@
                     <label class="uk-form-label" for="name">Full Name</label>
                     <div class="uk-form-controls">
                         <input class="uk-input uk-border-rounded" id="name" name="name" type="text" placeholder="Your name" v-model="name" v-validate="'required'">
-                        <span>{{ errors.first('email') }}</span>
+                        <span>{{ errors.first('name') }}</span>
                     </div>
                 </div>
                 <div class="uk-margin">
@@ -71,7 +71,15 @@
                         this.$router.push({name: 'login', params: {successRegistrationRedirect: true}})
                     },
                     error: function (res) {
-                        window.UIkit.notification({
+                        if (res.response != null && res.response.data != null && res.response.data.errors != null && res.response.data.errors.email.indexOf('The email has already been taken.') !== -1) {
+                            return window.UIkit.notification({
+                                message: 'The email is already been taken. Please use a different email address or reset your password.',
+                                status: 'warning',
+                                pos: 'bottom-center',
+                                timeout: 2500
+                            });
+                        }
+                        return window.UIkit.notification({
                             message: 'Something went wrong during registration. Please try again later or contact us.',
                             status: 'danger',
                             pos: 'bottom-center',

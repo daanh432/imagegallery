@@ -1,17 +1,17 @@
 @component('mail::message')
-    # Contact form submission
+# Contact form submission
 
-    {{ config('mail.to.name') }} you received a message on {{ config('app.url') }}.
+You received a message on https://imagegallery.daanhendriks.nl/.
 
-    First name: {{ $submission->name }}<br>
-    Email address: {{ $submission->email }}<br>
-    Message:<br>
-    {{ $submission->message }}
+First name: {{ $submission->name }}<br>
+Email address: {{ $submission->email }}<br>
+Message:<br>
+{{ $submission->message }}
 
-    @component('mail::button', ['url' => 'mailto:' . $submission->email ])
-        Respond to message
-    @endcomponent
+@component('mail::button', ['url' => 'mailto:' . $submission->email ])
+Respond to message
+@endcomponent
 
-    Kind regards,<br>
-    {{ config('app.name') }}
+Kind regards,<br>
+{{ config('app.name') }}
 @endcomponent
